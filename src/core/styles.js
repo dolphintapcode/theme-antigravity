@@ -24,6 +24,14 @@ export function buildStylesheet(config, customMedia = {}) {
   const blurPx = Math.max(0, Math.min(24, Number(config.blur ?? 0)));
   const accent = config.accentColor || '#f5c451';
 
+  const aiEnabled = Boolean(config.enabled && (config.aiCard?.enabled ?? true));
+  const aiOpacity = Math.max(0.3, Math.min(0.98, Number(config.aiCard?.opacity ?? 82) / 100));
+  const aiBlur = Math.max(0, Math.min(30, Number(config.aiCard?.blur ?? 16)));
+  const aiBg = bubble.aiBg || `rgba(15, 18, 26, ${aiOpacity})`;
+  const aiBorder = bubble.aiBorder || '1px solid rgba(255, 255, 255, 0.12)';
+  const aiShadow = bubble.aiShadow || '0 8px 32px rgba(0, 0, 0, 0.5)';
+  const aiTextColor = bubble.aiText || '#f4f4f5';
+
   const scrollCapCss = bubble.scrollCaps
     ? `
       .agy-ct-bubble-styled::before,
@@ -212,11 +220,82 @@ export function buildStylesheet(config, customMedia = {}) {
         width: 84px;
         height: 36px;
       }
+    `
+        : ''
+    }
 
-      /* ===== Styled Chat Input Box ===== */
-      ${
-        config.inputId !== 'none'
-          ? `
+    /* ===== Styled AI Response Card (Glassmorphism) ===== */
+    ${
+      aiEnabled
+        ? `
+      .agy-ct-ai-card-styled {
+        position: relative !important;
+        background: ${aiBg} !important;
+        backdrop-filter: blur(${aiBlur}px) saturate(140%) !important;
+        -webkit-backdrop-filter: blur(${aiBlur}px) saturate(140%) !important;
+        border: ${aiBorder} !important;
+        border-radius: 18px !important;
+        padding: 16px 22px !important;
+        margin: 10px 0 16px 0 !important;
+        box-shadow: ${aiShadow} !important;
+        box-sizing: border-box !important;
+        transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+      }
+      .agy-ct-ai-card-styled [data-markdown-root] {
+        color: ${aiTextColor} !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7) !important;
+        line-height: 1.65 !important;
+      }
+      .agy-ct-ai-card-styled h1,
+      .agy-ct-ai-card-styled h2,
+      .agy-ct-ai-card-styled h3,
+      .agy-ct-ai-card-styled h4,
+      .agy-ct-ai-card-styled h5,
+      .agy-ct-ai-card-styled h6 {
+        color: #ffffff !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85) !important;
+      }
+      .agy-ct-ai-card-styled strong,
+      .agy-ct-ai-card-styled b {
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+      }
+      .agy-ct-ai-card-styled a {
+        color: color-mix(in srgb, var(--agy-ct-accent) 75%, #60a5fa) !important;
+        text-decoration-color: rgba(255, 255, 255, 0.3) !important;
+      }
+      .agy-ct-ai-card-styled code:not(pre code) {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: ${bubble.sparkle || '#fef08a'} !important;
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+        border-radius: 4px !important;
+        padding: 1px 5px !important;
+        font-size: 0.9em !important;
+      }
+      .agy-ct-ai-card-styled pre {
+        background: rgba(10, 12, 18, 0.88) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 10px !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+      }
+      .agy-ct-ai-card-styled [data-testid="turn-cards-container"],
+      .agy-ct-ai-card-styled [data-testid*="tool-call"] {
+        background: rgba(12, 14, 20, 0.68) !important;
+        border: 1px solid rgba(255, 255, 255, 0.09) !important;
+        border-radius: 10px !important;
+        padding: 6px 12px !important;
+        margin-top: 8px !important;
+      }
+    `
+        : ''
+    }
+
+    /* ===== Styled Chat Input Box ===== */
+    ${
+      config.inputId !== 'none'
+        ? `
       .agy-ct-input-styled {
         position: relative !important;
         background: ${inputPreset.bg} !important;
@@ -229,9 +308,6 @@ export function buildStylesheet(config, customMedia = {}) {
       }
       .agy-ct-input-styled:focus-within {
         border-color: ${inputPreset.focusBorder} !important;
-      }
-      `
-          : ''
       }
     `
         : ''

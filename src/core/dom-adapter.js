@@ -143,6 +143,9 @@ export class DomAdapter {
     document.querySelectorAll('.agy-ct-bubble-styled').forEach((el) => {
       el.classList.remove('agy-ct-bubble-styled');
     });
+    document.querySelectorAll('.agy-ct-ai-card-styled').forEach((el) => {
+      el.classList.remove('agy-ct-ai-card-styled');
+    });
     document.querySelectorAll('.agy-ct-input-styled').forEach((el) => {
       el.classList.remove('agy-ct-input-styled');
     });
@@ -172,11 +175,13 @@ export class DomAdapter {
     if (!cfg.enabled) {
       document.querySelectorAll('.agy-ct-bubble-styled').forEach((el) => el.classList.remove('agy-ct-bubble-styled'));
       document.querySelectorAll('.agy-ct-bubble-mascot').forEach((el) => el.remove());
+      document.querySelectorAll('.agy-ct-ai-card-styled').forEach((el) => el.classList.remove('agy-ct-ai-card-styled'));
       document.querySelectorAll('.agy-ct-input-styled').forEach((el) => el.classList.remove('agy-ct-input-styled'));
       return;
     }
 
     this.decorateChatBubbles(cfg);
+    this.decorateAiResponses(cfg);
     this.decorateChatInput(cfg);
   }
 
@@ -225,7 +230,13 @@ export class DomAdapter {
 
   classifyRealAppSurface(el, style, vw, vh, composerBoxes = []) {
     if (this.isInsideInjectorUi(el) || this.isProtectedSurfaceEl(el)) return null;
-    if (el.closest?.('.agy-ct-bubble-styled')) return null;
+    if (
+      el.closest?.(
+        '.agy-ct-bubble-styled, .agy-ct-ai-card-styled, [data-testid="agent-response"], [data-testid*="agent-response"]'
+      )
+    ) {
+      return null;
+    }
     if (composerBoxes.some((box) => el === box || box.contains(el))) return null;
 
     const rect = el.getBoundingClientRect();
@@ -600,6 +611,51 @@ export class DomAdapter {
       } else if (mascotHost) {
         mascotHost.remove();
       }
+    }
+  }
+
+  findAiResponses(cfg) {
+    if (cfg.customSelectors?.aiResponse) {
+      return this.safeQueryAll(cfg.customSelectors.aiResponse).filter((el) => !this.isInsideInjectorUi(el));
+    }
+
+    const candidates = new Set();
+    const selectors = [
+      '[data-testid="agent-response"]',
+      '[data-testid*="agent-response"]',
+      '[data-testid*="assistant-message"]',
+      '[data-message-author="assistant"]',
+      '[data-message-role="assistant"]'
+    ];
+    for (const sel of selectors) {
+      document.querySelectorAll(sel).forEach((el) => {
+        if (!this.isInsideInjectorUi(el)) candidates.add(el);
+      });
+    }
+    const raw = Array.from(candidates);
+    return raw.filter((el) => !raw.some((other) => other !== el && other.contains(el)));
+  }
+
+  decorateAiResponses(cfg) {
+    const aiEnabled = cfg.enabled && (cfg.aiCard?.enabled ?? true);
+    const aiResponses = this.findAiResponses(cfg);
+    const aiSet = new Set(aiResponses);
+
+    if (!aiEnabled) {
+      document.querySelectorAll('.agy-ct-ai-card-styled').forEach((el) => {
+        el.classList.remove('agy-ct-ai-card-styled');
+      });
+      return;
+    }
+
+    document.querySelectorAll('.agy-ct-ai-card-styled').forEach((el) => {
+      if (!aiSet.has(el)) {
+        el.classList.remove('agy-ct-ai-card-styled');
+      }
+    });
+
+    for (const el of aiResponses) {
+      el.classList.add('agy-ct-ai-card-styled');
     }
   }
 

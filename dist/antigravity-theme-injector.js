@@ -1340,7 +1340,11 @@ const BUBBLE_PRESETS = [
     text: '#d4d4d8',
     shadow: 'none',
     radius: '12px',
-    sparkle: null
+    sparkle: null,
+    aiBg: 'rgba(15, 18, 26, 0.82)',
+    aiBorder: '1px solid rgba(255, 255, 255, 0.12)',
+    aiShadow: '0 8px 30px rgba(0, 0, 0, 0.45)',
+    aiText: '#f4f4f5'
   },
   {
     id: 'meo-than',
@@ -1353,7 +1357,11 @@ const BUBBLE_PRESETS = [
     text: '#f7eee6',
     shadow: '0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 226, 194, 0.14)',
     radius: '14px',
-    sparkle: '#f6d198'
+    sparkle: '#f6d198',
+    aiBg: 'linear-gradient(135deg, rgba(30, 24, 20, 0.88), rgba(20, 15, 12, 0.92))',
+    aiBorder: '1.2px solid rgba(212, 162, 118, 0.38)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 226, 194, 0.08)',
+    aiText: '#f7eee6'
   },
   {
     id: 'thien-ha',
@@ -1366,7 +1374,11 @@ const BUBBLE_PRESETS = [
     text: '#eef6ff',
     shadow: '0 6px 22px rgba(8, 16, 28, 0.6), 0 0 16px rgba(96, 165, 250, 0.14)',
     radius: '14px',
-    sparkle: '#fcd34d'
+    sparkle: '#fcd34d',
+    aiBg: 'linear-gradient(135deg, rgba(16, 26, 36, 0.88), rgba(11, 18, 27, 0.92))',
+    aiBorder: '1.2px solid rgba(147, 197, 253, 0.35)',
+    aiShadow: '0 8px 32px rgba(8, 16, 28, 0.58), 0 0 18px rgba(96, 165, 250, 0.12)',
+    aiText: '#eef6ff'
   },
   {
     id: 'co-thu',
@@ -1379,7 +1391,11 @@ const BUBBLE_PRESETS = [
     text: '#3b2410',
     shadow: '0 6px 20px rgba(0, 0, 0, 0.48), inset 0 0 14px rgba(139, 90, 27, 0.25)',
     radius: '6px',
-    sparkle: '#9c5a14'
+    sparkle: '#9c5a14',
+    aiBg: 'linear-gradient(180deg, rgba(46, 35, 22, 0.9), rgba(35, 26, 16, 0.94))',
+    aiBorder: '1.2px solid rgba(214, 177, 100, 0.45)',
+    aiShadow: '0 8px 30px rgba(0, 0, 0, 0.55), inset 0 0 16px rgba(139, 90, 27, 0.2)',
+    aiText: '#f7edd7'
   },
   {
     id: 'toi-gian',
@@ -1391,7 +1407,11 @@ const BUBBLE_PRESETS = [
     text: '#f3f4f6',
     shadow: '0 4px 16px rgba(0, 0, 0, 0.35)',
     radius: '18px',
-    sparkle: null
+    sparkle: null,
+    aiBg: 'rgba(22, 20, 24, 0.86)',
+    aiBorder: '1px solid rgba(255, 255, 255, 0.14)',
+    aiShadow: '0 8px 28px rgba(0, 0, 0, 0.45)',
+    aiText: '#f3f4f6'
   },
   {
     id: 'meo-huyen-thuat',
@@ -1404,7 +1424,11 @@ const BUBBLE_PRESETS = [
     text: '#fdecd8',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.55), 0 0 18px rgba(245, 158, 11, 0.16)',
     radius: '14px',
-    sparkle: '#fb923c'
+    sparkle: '#fb923c',
+    aiBg: 'linear-gradient(135deg, rgba(28, 20, 20, 0.9), rgba(18, 13, 16, 0.92))',
+    aiBorder: '1.2px solid rgba(245, 158, 11, 0.38)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.55), 0 0 18px rgba(245, 158, 11, 0.12)',
+    aiText: '#fdecd8'
   },
   {
     id: 'rong-ngoc',
@@ -1417,7 +1441,11 @@ const BUBBLE_PRESETS = [
     text: '#e6fff7',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.5), 0 0 16px rgba(52, 211, 153, 0.16)',
     radius: '14px',
-    sparkle: '#6ee7b7'
+    sparkle: '#6ee7b7',
+    aiBg: 'linear-gradient(135deg, rgba(14, 34, 30, 0.88), rgba(9, 23, 21, 0.92))',
+    aiBorder: '1.2px solid rgba(52, 211, 153, 0.38)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.52), 0 0 18px rgba(52, 211, 153, 0.12)',
+    aiText: '#e6fff7'
   },
   {
     id: 'phu-thuy-anh-trang',
@@ -1430,7 +1458,11 @@ const BUBBLE_PRESETS = [
     text: '#f5eeff',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.52), 0 0 18px rgba(192, 132, 252, 0.18)',
     radius: '14px',
-    sparkle: '#d8b4fe'
+    sparkle: '#d8b4fe',
+    aiBg: 'linear-gradient(135deg, rgba(30, 24, 46, 0.88), rgba(19, 15, 32, 0.92))',
+    aiBorder: '1.2px solid rgba(192, 132, 252, 0.38)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.55), 0 0 18px rgba(192, 132, 252, 0.14)',
+    aiText: '#f5eeff'
   },
   {
     id: 'ho-ly-chibi',
@@ -1443,7 +1475,11 @@ const BUBBLE_PRESETS = [
     text: '#fff2e8',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.5), 0 0 18px rgba(249, 115, 22, 0.16)',
     radius: '14px',
-    sparkle: '#fdba74'
+    sparkle: '#fdba74',
+    aiBg: 'linear-gradient(135deg, rgba(36, 24, 18, 0.88), rgba(22, 15, 12, 0.92))',
+    aiBorder: '1.2px solid rgba(251, 146, 60, 0.38)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.52), 0 0 18px rgba(249, 115, 22, 0.12)',
+    aiText: '#fff2e8'
   },
   {
     id: 'loi-kiem',
@@ -1456,7 +1492,11 @@ const BUBBLE_PRESETS = [
     text: '#fef9e7',
     shadow: '0 6px 24px rgba(0, 0, 0, 0.6), 0 0 18px rgba(250, 204, 21, 0.22)',
     radius: '12px',
-    sparkle: '#fde047'
+    sparkle: '#fde047',
+    aiBg: 'linear-gradient(135deg, rgba(20, 18, 16, 0.9), rgba(30, 19, 16, 0.92))',
+    aiBorder: '1.2px solid rgba(250, 204, 21, 0.45)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.58), 0 0 20px rgba(250, 204, 21, 0.16)',
+    aiText: '#fef9e7'
   },
   {
     id: 'hoa-anh-dao',
@@ -1469,7 +1509,11 @@ const BUBBLE_PRESETS = [
     text: '#fff1f7',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.5), 0 0 16px rgba(244, 114, 182, 0.18)',
     radius: '16px',
-    sparkle: '#f9a8d4'
+    sparkle: '#f9a8d4',
+    aiBg: 'linear-gradient(135deg, rgba(38, 20, 30, 0.88), rgba(24, 13, 21, 0.92))',
+    aiBorder: '1.2px solid rgba(244, 114, 182, 0.4)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.55), 0 0 20px rgba(244, 114, 182, 0.14)',
+    aiText: '#fff1f7'
   },
   {
     id: 'den-long-dem',
@@ -1482,7 +1526,11 @@ const BUBBLE_PRESETS = [
     text: '#fef3c7',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.52), 0 0 18px rgba(245, 158, 11, 0.2)',
     radius: '14px',
-    sparkle: '#fbbf24'
+    sparkle: '#fbbf24',
+    aiBg: 'linear-gradient(135deg, rgba(34, 22, 14, 0.9), rgba(22, 13, 9, 0.92))',
+    aiBorder: '1.2px solid rgba(251, 191, 36, 0.42)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.55), 0 0 18px rgba(245, 158, 11, 0.15)',
+    aiText: '#fef3c7'
   },
   {
     id: 'cyber-jade',
@@ -1495,7 +1543,11 @@ const BUBBLE_PRESETS = [
     text: '#e0f2fe',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.55), 0 0 18px rgba(56, 189, 248, 0.2)',
     radius: '8px',
-    sparkle: '#38bdf8'
+    sparkle: '#38bdf8',
+    aiBg: 'linear-gradient(135deg, rgba(9, 18, 26, 0.88), rgba(12, 14, 24, 0.92))',
+    aiBorder: '1.2px solid rgba(56, 189, 248, 0.42)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.55), 0 0 20px rgba(56, 189, 248, 0.15)',
+    aiText: '#e0f2fe'
   }
 ];
 
@@ -1855,6 +1907,11 @@ const DEFAULT_CONFIG = {
   atmosphereIntensity: 65,
   bubbleId: 'loi-kiem',
   bubbleMascotEnabled: true,
+  aiCard: {
+    enabled: true,
+    opacity: 82,
+    blur: 16
+  },
   inputId: 'loi-anh-kim',
   pet: {
     enabled: true,
@@ -1877,6 +1934,7 @@ const DEFAULT_CONFIG = {
     sidebar: '',
     mainCanvas: '',
     chatBubble: '',
+    aiResponse: '',
     chatInput: '',
     settingsNavList: '',
     settingsContent: ''
@@ -2137,6 +2195,14 @@ function buildStylesheet(config, customMedia = {}) {
   const blurPx = Math.max(0, Math.min(24, Number(config.blur ?? 0)));
   const accent = config.accentColor || '#f5c451';
 
+  const aiEnabled = Boolean(config.enabled && (config.aiCard?.enabled ?? true));
+  const aiOpacity = Math.max(0.3, Math.min(0.98, Number(config.aiCard?.opacity ?? 82) / 100));
+  const aiBlur = Math.max(0, Math.min(30, Number(config.aiCard?.blur ?? 16)));
+  const aiBg = bubble.aiBg || `rgba(15, 18, 26, ${aiOpacity})`;
+  const aiBorder = bubble.aiBorder || '1px solid rgba(255, 255, 255, 0.12)';
+  const aiShadow = bubble.aiShadow || '0 8px 32px rgba(0, 0, 0, 0.5)';
+  const aiTextColor = bubble.aiText || '#f4f4f5';
+
   const scrollCapCss = bubble.scrollCaps
     ? `
       .agy-ct-bubble-styled::before,
@@ -2325,11 +2391,82 @@ function buildStylesheet(config, customMedia = {}) {
         width: 84px;
         height: 36px;
       }
+    `
+        : ''
+    }
 
-      /* ===== Styled Chat Input Box ===== */
-      ${
-        config.inputId !== 'none'
-          ? `
+    /* ===== Styled AI Response Card (Glassmorphism) ===== */
+    ${
+      aiEnabled
+        ? `
+      .agy-ct-ai-card-styled {
+        position: relative !important;
+        background: ${aiBg} !important;
+        backdrop-filter: blur(${aiBlur}px) saturate(140%) !important;
+        -webkit-backdrop-filter: blur(${aiBlur}px) saturate(140%) !important;
+        border: ${aiBorder} !important;
+        border-radius: 18px !important;
+        padding: 16px 22px !important;
+        margin: 10px 0 16px 0 !important;
+        box-shadow: ${aiShadow} !important;
+        box-sizing: border-box !important;
+        transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+      }
+      .agy-ct-ai-card-styled [data-markdown-root] {
+        color: ${aiTextColor} !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7) !important;
+        line-height: 1.65 !important;
+      }
+      .agy-ct-ai-card-styled h1,
+      .agy-ct-ai-card-styled h2,
+      .agy-ct-ai-card-styled h3,
+      .agy-ct-ai-card-styled h4,
+      .agy-ct-ai-card-styled h5,
+      .agy-ct-ai-card-styled h6 {
+        color: #ffffff !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85) !important;
+      }
+      .agy-ct-ai-card-styled strong,
+      .agy-ct-ai-card-styled b {
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+      }
+      .agy-ct-ai-card-styled a {
+        color: color-mix(in srgb, var(--agy-ct-accent) 75%, #60a5fa) !important;
+        text-decoration-color: rgba(255, 255, 255, 0.3) !important;
+      }
+      .agy-ct-ai-card-styled code:not(pre code) {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: ${bubble.sparkle || '#fef08a'} !important;
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+        border-radius: 4px !important;
+        padding: 1px 5px !important;
+        font-size: 0.9em !important;
+      }
+      .agy-ct-ai-card-styled pre {
+        background: rgba(10, 12, 18, 0.88) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 10px !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+      }
+      .agy-ct-ai-card-styled [data-testid="turn-cards-container"],
+      .agy-ct-ai-card-styled [data-testid*="tool-call"] {
+        background: rgba(12, 14, 20, 0.68) !important;
+        border: 1px solid rgba(255, 255, 255, 0.09) !important;
+        border-radius: 10px !important;
+        padding: 6px 12px !important;
+        margin-top: 8px !important;
+      }
+    `
+        : ''
+    }
+
+    /* ===== Styled Chat Input Box ===== */
+    ${
+      config.inputId !== 'none'
+        ? `
       .agy-ct-input-styled {
         position: relative !important;
         background: ${inputPreset.bg} !important;
@@ -2342,9 +2479,6 @@ function buildStylesheet(config, customMedia = {}) {
       }
       .agy-ct-input-styled:focus-within {
         border-color: ${inputPreset.focusBorder} !important;
-      }
-      `
-          : ''
       }
     `
         : ''
@@ -3626,6 +3760,9 @@ class DomAdapter {
     document.querySelectorAll('.agy-ct-bubble-styled').forEach((el) => {
       el.classList.remove('agy-ct-bubble-styled');
     });
+    document.querySelectorAll('.agy-ct-ai-card-styled').forEach((el) => {
+      el.classList.remove('agy-ct-ai-card-styled');
+    });
     document.querySelectorAll('.agy-ct-input-styled').forEach((el) => {
       el.classList.remove('agy-ct-input-styled');
     });
@@ -3655,11 +3792,13 @@ class DomAdapter {
     if (!cfg.enabled) {
       document.querySelectorAll('.agy-ct-bubble-styled').forEach((el) => el.classList.remove('agy-ct-bubble-styled'));
       document.querySelectorAll('.agy-ct-bubble-mascot').forEach((el) => el.remove());
+      document.querySelectorAll('.agy-ct-ai-card-styled').forEach((el) => el.classList.remove('agy-ct-ai-card-styled'));
       document.querySelectorAll('.agy-ct-input-styled').forEach((el) => el.classList.remove('agy-ct-input-styled'));
       return;
     }
 
     this.decorateChatBubbles(cfg);
+    this.decorateAiResponses(cfg);
     this.decorateChatInput(cfg);
   }
 
@@ -3708,7 +3847,13 @@ class DomAdapter {
 
   classifyRealAppSurface(el, style, vw, vh, composerBoxes = []) {
     if (this.isInsideInjectorUi(el) || this.isProtectedSurfaceEl(el)) return null;
-    if (el.closest?.('.agy-ct-bubble-styled')) return null;
+    if (
+      el.closest?.(
+        '.agy-ct-bubble-styled, .agy-ct-ai-card-styled, [data-testid="agent-response"], [data-testid*="agent-response"]'
+      )
+    ) {
+      return null;
+    }
     if (composerBoxes.some((box) => el === box || box.contains(el))) return null;
 
     const rect = el.getBoundingClientRect();
@@ -4083,6 +4228,51 @@ class DomAdapter {
       } else if (mascotHost) {
         mascotHost.remove();
       }
+    }
+  }
+
+  findAiResponses(cfg) {
+    if (cfg.customSelectors?.aiResponse) {
+      return this.safeQueryAll(cfg.customSelectors.aiResponse).filter((el) => !this.isInsideInjectorUi(el));
+    }
+
+    const candidates = new Set();
+    const selectors = [
+      '[data-testid="agent-response"]',
+      '[data-testid*="agent-response"]',
+      '[data-testid*="assistant-message"]',
+      '[data-message-author="assistant"]',
+      '[data-message-role="assistant"]'
+    ];
+    for (const sel of selectors) {
+      document.querySelectorAll(sel).forEach((el) => {
+        if (!this.isInsideInjectorUi(el)) candidates.add(el);
+      });
+    }
+    const raw = Array.from(candidates);
+    return raw.filter((el) => !raw.some((other) => other !== el && other.contains(el)));
+  }
+
+  decorateAiResponses(cfg) {
+    const aiEnabled = cfg.enabled && (cfg.aiCard?.enabled ?? true);
+    const aiResponses = this.findAiResponses(cfg);
+    const aiSet = new Set(aiResponses);
+
+    if (!aiEnabled) {
+      document.querySelectorAll('.agy-ct-ai-card-styled').forEach((el) => {
+        el.classList.remove('agy-ct-ai-card-styled');
+      });
+      return;
+    }
+
+    document.querySelectorAll('.agy-ct-ai-card-styled').forEach((el) => {
+      if (!aiSet.has(el)) {
+        el.classList.remove('agy-ct-ai-card-styled');
+      }
+    });
+
+    for (const el of aiResponses) {
+      el.classList.add('agy-ct-ai-card-styled');
     }
   }
 
@@ -4810,6 +5000,11 @@ const I18N = {
     bubbleSub: 'Chọn một mẫu để áp dụng ngay cho tin nhắn của bạn.',
     bubbleMascot: 'Hiện linh vật trên bong bóng',
     clearBubbleBtn: '🧹 Xoá bong bóng & icon',
+    aiCardTitle: 'Khung kính câu trả lời AI (Glass Card)',
+    aiCardSub: 'Bọc câu trả lời của AI trong thẻ kính mờ cao cấp, chống chói và chống nuốt chữ trên mọi ảnh nền.',
+    aiCardToggle: 'Bật khung kính AI',
+    aiCardOpacity: 'Độ tối khung AI',
+    aiCardBlur: 'Độ mờ kính AI',
     inputTitle: 'Khung nhập chat',
     inputSub: 'Chọn phong cách cho khung soạn tin nhắn; không thay đổi chức năng nhập.',
     stickerTitle: 'Sticker trang trí',
@@ -4830,6 +5025,7 @@ const I18N = {
     advTitle: 'Nâng cao & Chọn vùng DOM (Injector)',
     advSub: 'Nếu bản cập nhật Antigravity đổi tên class, dùng công cụ chọn trực tiếp phần tử cần trang trí.',
     pickBubble: '🎯 Chọn Bong bóng chat',
+    pickAiResponse: '🎯 Chọn Câu trả lời AI',
     pickInput: '🎯 Chọn Khung nhập chat',
     pickSidebar: '🎯 Chọn Sidebar',
     clearSelectors: 'Xoá Selector tuỳ chỉnh',
@@ -4870,6 +5066,11 @@ const I18N = {
     bubbleSub: 'Choose a preset style for your chat messages.',
     bubbleMascot: 'Show mascot topper on bubbles',
     clearBubbleBtn: '🧹 Clear bubble & icon',
+    aiCardTitle: 'AI Response Glass Card',
+    aiCardSub: 'Wraps AI answers in a modern glassmorphism card for crystal clear readability on all wallpapers.',
+    aiCardToggle: 'Enable AI Glass Card',
+    aiCardOpacity: 'AI Card Darkness',
+    aiCardBlur: 'AI Card Blur',
     inputTitle: 'Chat Input Box',
     inputSub: 'Customize the composer frame without altering typing functionality.',
     stickerTitle: 'Decorative Stickers',
@@ -4890,6 +5091,7 @@ const I18N = {
     advTitle: 'Advanced & DOM Selector Picker',
     advSub: 'If an app update changes CSS classes, pick elements visually to bind styles cleanly.',
     pickBubble: '🎯 Pick Chat Bubble',
+    pickAiResponse: '🎯 Pick AI Response Area',
     pickInput: '🎯 Pick Input Box',
     pickSidebar: '🎯 Pick Sidebar',
     clearSelectors: 'Clear Custom Selectors',
@@ -5057,6 +5259,7 @@ class SettingsPanel {
       atmosphereIntensity: cfg.atmosphereIntensity,
       bubbleId: cfg.bubbleId,
       bubbleMascotEnabled: Boolean(cfg.bubbleMascotEnabled),
+      aiCard: JSON.parse(JSON.stringify(cfg.aiCard || { enabled: true, opacity: 82, blur: 16 })),
       inputId: cfg.inputId,
       pet: JSON.parse(JSON.stringify(cfg.pet || { enabled: false, id: '' })),
       stickers: JSON.parse(JSON.stringify(cfg.stickers || { enabled: false, items: [] }))
@@ -5208,7 +5411,7 @@ class SettingsPanel {
     overlay.querySelector('[data-modal-act="sync-current"]')?.addEventListener('click', (e) => {
       e.stopPropagation();
       const live = this.snapshotBundlePatch(this.getConfig());
-      syncedExtra = { accentColor: live.accentColor, atmosphereIntensity: live.atmosphereIntensity, bubbleMascotEnabled: live.bubbleMascotEnabled, stickers: live.stickers, pet: live.pet };
+      syncedExtra = { accentColor: live.accentColor, atmosphereIntensity: live.atmosphereIntensity, bubbleMascotEnabled: live.bubbleMascotEnabled, aiCard: live.aiCard, stickers: live.stickers, pet: live.pet };
       getField('wallpaperId').value = live.wallpaperId;
       getField('wallpaperFit').value = live.wallpaperFit;
       getField('atmosphereId').value = live.atmosphereId;
@@ -5530,6 +5733,40 @@ class SettingsPanel {
         </div>
       </div>
 
+      <!-- AI Response Glass Card -->
+      <div class="agy-ct-section">
+        <div class="agy-ct-section-head" style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <h3>${escapeHtml(t.aiCardTitle)}</h3>
+            <p>${escapeHtml(t.aiCardSub)}</p>
+          </div>
+          <div>
+            <label class="agy-ct-switch">
+              <input type="checkbox" data-act="toggle-ai-card" ${(cfg.aiCard?.enabled ?? true) ? 'checked' : ''} />
+              <span>${escapeHtml(t.aiCardToggle)}</span>
+            </label>
+          </div>
+        </div>
+        ${
+          (cfg.aiCard?.enabled ?? true)
+            ? `
+          <div class="agy-ct-controls-box" style="margin-top:12px;">
+            <div class="agy-ct-slider-row">
+              <div class="agy-ct-slider-label"><strong>${escapeHtml(t.aiCardOpacity)}</strong></div>
+              <input type="range" class="agy-ct-range" min="30" max="98" value="${cfg.aiCard?.opacity ?? 82}" data-slider="aiCard.opacity" />
+              <span class="agy-ct-range-val" data-slider-val="aiCard.opacity">${cfg.aiCard?.opacity ?? 82}%</span>
+            </div>
+            <div class="agy-ct-slider-row">
+              <div class="agy-ct-slider-label"><strong>${escapeHtml(t.aiCardBlur)}</strong></div>
+              <input type="range" class="agy-ct-range" min="0" max="28" value="${cfg.aiCard?.blur ?? 16}" data-slider="aiCard.blur" />
+              <span class="agy-ct-range-val" data-slider-val="aiCard.blur">${cfg.aiCard?.blur ?? 16}px</span>
+            </div>
+          </div>
+        `
+            : ''
+        }
+      </div>
+
       <!-- Chat Input Box (Matches Image 1) -->
       <div class="agy-ct-section">
         <div class="agy-ct-section-head">
@@ -5729,6 +5966,7 @@ class SettingsPanel {
         </div>
         <div class="agy-ct-actions-row">
           <button type="button" class="agy-ct-btn" data-act="pick-dom" data-target="chatBubble" data-label="Bong bóng chat">${escapeHtml(t.pickBubble)}</button>
+          <button type="button" class="agy-ct-btn" data-act="pick-dom" data-target="aiResponse" data-label="Câu trả lời AI">${escapeHtml(t.pickAiResponse)}</button>
           <button type="button" class="agy-ct-btn" data-act="pick-dom" data-target="chatInput" data-label="Khung nhập chat">${escapeHtml(t.pickInput)}</button>
           <button type="button" class="agy-ct-btn" data-act="pick-dom" data-target="sidebar" data-label="Sidebar">${escapeHtml(t.pickSidebar)}</button>
           <button type="button" class="agy-ct-btn" data-act="clear-selectors">${escapeHtml(t.clearSelectors)}</button>
@@ -5961,6 +6199,7 @@ class SettingsPanel {
             sidebar: '',
             mainCanvas: '',
             chatBubble: '',
+            aiResponse: '',
             chatInput: '',
             settingsNavList: '',
             settingsContent: ''
@@ -6016,6 +6255,9 @@ class SettingsPanel {
         this.onPatch({ enabled: Boolean(el.checked) });
       } else if (act === 'toggle-bubble-mascot') {
         this.onPatch({ bubbleMascotEnabled: Boolean(el.checked) });
+      } else if (act === 'toggle-ai-card') {
+        const curAi = this.getConfig().aiCard || {};
+        this.onPatch({ aiCard: { ...curAi, enabled: Boolean(el.checked) } });
       } else if (act === 'toggle-stickers') {
         this.onPatch({ stickers: { enabled: Boolean(el.checked) } });
       } else if (act === 'toggle-pet') {
@@ -6040,12 +6282,15 @@ class SettingsPanel {
         const num = Number(el.value);
         const labelEl = this.root.querySelector(`[data-slider-val="${key}"]`);
         if (labelEl) {
-          const unit = key === 'blur' || key === 'pet.size' ? 'px' : '%';
+          const unit = key === 'blur' || key === 'pet.size' || key === 'aiCard.blur' ? 'px' : '%';
           labelEl.textContent = `${num}${unit}`;
         }
         if (key.startsWith('pet.')) {
           const sub = key.split('.')[1];
           this.onLiveUpdate({ pet: { [sub]: num } });
+        } else if (key.startsWith('aiCard.')) {
+          const sub = key.split('.')[1];
+          this.onLiveUpdate({ aiCard: { [sub]: num } });
         } else {
           this.onLiveUpdate({ [key]: num });
         }

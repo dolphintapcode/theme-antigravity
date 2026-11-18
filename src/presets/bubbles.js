@@ -13,7 +13,11 @@ export const BUBBLE_PRESETS = [
     text: '#d4d4d8',
     shadow: 'none',
     radius: '12px',
-    sparkle: null
+    sparkle: null,
+    aiBg: 'rgba(15, 18, 26, 0.82)',
+    aiBorder: '1px solid rgba(255, 255, 255, 0.12)',
+    aiShadow: '0 8px 30px rgba(0, 0, 0, 0.45)',
+    aiText: '#f4f4f5'
   },
   {
     id: 'meo-than',
@@ -26,7 +30,11 @@ export const BUBBLE_PRESETS = [
     text: '#f7eee6',
     shadow: '0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 226, 194, 0.14)',
     radius: '14px',
-    sparkle: '#f6d198'
+    sparkle: '#f6d198',
+    aiBg: 'linear-gradient(135deg, rgba(30, 24, 20, 0.88), rgba(20, 15, 12, 0.92))',
+    aiBorder: '1.2px solid rgba(212, 162, 118, 0.38)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 226, 194, 0.08)',
+    aiText: '#f7eee6'
   },
   {
     id: 'thien-ha',
@@ -39,7 +47,11 @@ export const BUBBLE_PRESETS = [
     text: '#eef6ff',
     shadow: '0 6px 22px rgba(8, 16, 28, 0.6), 0 0 16px rgba(96, 165, 250, 0.14)',
     radius: '14px',
-    sparkle: '#fcd34d'
+    sparkle: '#fcd34d',
+    aiBg: 'linear-gradient(135deg, rgba(16, 26, 36, 0.88), rgba(11, 18, 27, 0.92))',
+    aiBorder: '1.2px solid rgba(147, 197, 253, 0.35)',
+    aiShadow: '0 8px 32px rgba(8, 16, 28, 0.58), 0 0 18px rgba(96, 165, 250, 0.12)',
+    aiText: '#eef6ff'
   },
   {
     id: 'co-thu',
@@ -52,7 +64,11 @@ export const BUBBLE_PRESETS = [
     text: '#3b2410',
     shadow: '0 6px 20px rgba(0, 0, 0, 0.48), inset 0 0 14px rgba(139, 90, 27, 0.25)',
     radius: '6px',
-    sparkle: '#9c5a14'
+    sparkle: '#9c5a14',
+    aiBg: 'linear-gradient(180deg, rgba(46, 35, 22, 0.9), rgba(35, 26, 16, 0.94))',
+    aiBorder: '1.2px solid rgba(214, 177, 100, 0.45)',
+    aiShadow: '0 8px 30px rgba(0, 0, 0, 0.55), inset 0 0 16px rgba(139, 90, 27, 0.2)',
+    aiText: '#f7edd7'
   },
   {
     id: 'toi-gian',
@@ -64,7 +80,11 @@ export const BUBBLE_PRESETS = [
     text: '#f3f4f6',
     shadow: '0 4px 16px rgba(0, 0, 0, 0.35)',
     radius: '18px',
-    sparkle: null
+    sparkle: null,
+    aiBg: 'rgba(22, 20, 24, 0.86)',
+    aiBorder: '1px solid rgba(255, 255, 255, 0.14)',
+    aiShadow: '0 8px 28px rgba(0, 0, 0, 0.45)',
+    aiText: '#f3f4f6'
   },
   {
     id: 'meo-huyen-thuat',
@@ -77,7 +97,11 @@ export const BUBBLE_PRESETS = [
     text: '#fdecd8',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.55), 0 0 18px rgba(245, 158, 11, 0.16)',
     radius: '14px',
-    sparkle: '#fb923c'
+    sparkle: '#fb923c',
+    aiBg: 'linear-gradient(135deg, rgba(28, 20, 20, 0.9), rgba(18, 13, 16, 0.92))',
+    aiBorder: '1.2px solid rgba(245, 158, 11, 0.38)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.55), 0 0 18px rgba(245, 158, 11, 0.12)',
+    aiText: '#fdecd8'
   },
   {
     id: 'rong-ngoc',
@@ -90,7 +114,11 @@ export const BUBBLE_PRESETS = [
     text: '#e6fff7',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.5), 0 0 16px rgba(52, 211, 153, 0.16)',
     radius: '14px',
-    sparkle: '#6ee7b7'
+    sparkle: '#6ee7b7',
+    aiBg: 'linear-gradient(135deg, rgba(14, 34, 30, 0.88), rgba(9, 23, 21, 0.92))',
+    aiBorder: '1.2px solid rgba(52, 211, 153, 0.38)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.52), 0 0 18px rgba(52, 211, 153, 0.12)',
+    aiText: '#e6fff7'
   },
   {
     id: 'phu-thuy-anh-trang',
@@ -103,7 +131,11 @@ export const BUBBLE_PRESETS = [
     text: '#f5eeff',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.52), 0 0 18px rgba(192, 132, 252, 0.18)',
     radius: '14px',
-    sparkle: '#d8b4fe'
+    sparkle: '#d8b4fe',
+    aiBg: 'linear-gradient(135deg, rgba(30, 24, 46, 0.88), rgba(19, 15, 32, 0.92))',
+    aiBorder: '1.2px solid rgba(192, 132, 252, 0.38)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.55), 0 0 18px rgba(192, 132, 252, 0.14)',
+    aiText: '#f5eeff'
   },
   {
     id: 'ho-ly-chibi',
@@ -116,7 +148,11 @@ export const BUBBLE_PRESETS = [
     text: '#fff2e8',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.5), 0 0 18px rgba(249, 115, 22, 0.16)',
     radius: '14px',
-    sparkle: '#fdba74'
+    sparkle: '#fdba74',
+    aiBg: 'linear-gradient(135deg, rgba(36, 24, 18, 0.88), rgba(22, 15, 12, 0.92))',
+    aiBorder: '1.2px solid rgba(251, 146, 60, 0.38)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.52), 0 0 18px rgba(249, 115, 22, 0.12)',
+    aiText: '#fff2e8'
   },
   {
     id: 'loi-kiem',
@@ -129,7 +165,11 @@ export const BUBBLE_PRESETS = [
     text: '#fef9e7',
     shadow: '0 6px 24px rgba(0, 0, 0, 0.6), 0 0 18px rgba(250, 204, 21, 0.22)',
     radius: '12px',
-    sparkle: '#fde047'
+    sparkle: '#fde047',
+    aiBg: 'linear-gradient(135deg, rgba(20, 18, 16, 0.9), rgba(30, 19, 16, 0.92))',
+    aiBorder: '1.2px solid rgba(250, 204, 21, 0.45)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.58), 0 0 20px rgba(250, 204, 21, 0.16)',
+    aiText: '#fef9e7'
   },
   {
     id: 'hoa-anh-dao',
@@ -142,7 +182,11 @@ export const BUBBLE_PRESETS = [
     text: '#fff1f7',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.5), 0 0 16px rgba(244, 114, 182, 0.18)',
     radius: '16px',
-    sparkle: '#f9a8d4'
+    sparkle: '#f9a8d4',
+    aiBg: 'linear-gradient(135deg, rgba(38, 20, 30, 0.88), rgba(24, 13, 21, 0.92))',
+    aiBorder: '1.2px solid rgba(244, 114, 182, 0.4)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.55), 0 0 20px rgba(244, 114, 182, 0.14)',
+    aiText: '#fff1f7'
   },
   {
     id: 'den-long-dem',
@@ -155,7 +199,11 @@ export const BUBBLE_PRESETS = [
     text: '#fef3c7',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.52), 0 0 18px rgba(245, 158, 11, 0.2)',
     radius: '14px',
-    sparkle: '#fbbf24'
+    sparkle: '#fbbf24',
+    aiBg: 'linear-gradient(135deg, rgba(34, 22, 14, 0.9), rgba(22, 13, 9, 0.92))',
+    aiBorder: '1.2px solid rgba(251, 191, 36, 0.42)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.55), 0 0 18px rgba(245, 158, 11, 0.15)',
+    aiText: '#fef3c7'
   },
   {
     id: 'cyber-jade',
@@ -168,6 +216,10 @@ export const BUBBLE_PRESETS = [
     text: '#e0f2fe',
     shadow: '0 6px 22px rgba(0, 0, 0, 0.55), 0 0 18px rgba(56, 189, 248, 0.2)',
     radius: '8px',
-    sparkle: '#38bdf8'
+    sparkle: '#38bdf8',
+    aiBg: 'linear-gradient(135deg, rgba(9, 18, 26, 0.88), rgba(12, 14, 24, 0.92))',
+    aiBorder: '1.2px solid rgba(56, 189, 248, 0.42)',
+    aiShadow: '0 8px 32px rgba(0, 0, 0, 0.55), 0 0 20px rgba(56, 189, 248, 0.15)',
+    aiText: '#e0f2fe'
   }
 ];

@@ -40,6 +40,11 @@ const I18N = {
     bubbleSub: 'Chọn một mẫu để áp dụng ngay cho tin nhắn của bạn.',
     bubbleMascot: 'Hiện linh vật trên bong bóng',
     clearBubbleBtn: '🧹 Xoá bong bóng & icon',
+    aiCardTitle: 'Khung kính câu trả lời AI (Glass Card)',
+    aiCardSub: 'Bọc câu trả lời của AI trong thẻ kính mờ cao cấp, chống chói và chống nuốt chữ trên mọi ảnh nền.',
+    aiCardToggle: 'Bật khung kính AI',
+    aiCardOpacity: 'Độ tối khung AI',
+    aiCardBlur: 'Độ mờ kính AI',
     inputTitle: 'Khung nhập chat',
     inputSub: 'Chọn phong cách cho khung soạn tin nhắn; không thay đổi chức năng nhập.',
     stickerTitle: 'Sticker trang trí',
@@ -60,6 +65,7 @@ const I18N = {
     advTitle: 'Nâng cao & Chọn vùng DOM (Injector)',
     advSub: 'Nếu bản cập nhật Antigravity đổi tên class, dùng công cụ chọn trực tiếp phần tử cần trang trí.',
     pickBubble: '🎯 Chọn Bong bóng chat',
+    pickAiResponse: '🎯 Chọn Câu trả lời AI',
     pickInput: '🎯 Chọn Khung nhập chat',
     pickSidebar: '🎯 Chọn Sidebar',
     clearSelectors: 'Xoá Selector tuỳ chỉnh',
@@ -100,6 +106,11 @@ const I18N = {
     bubbleSub: 'Choose a preset style for your chat messages.',
     bubbleMascot: 'Show mascot topper on bubbles',
     clearBubbleBtn: '🧹 Clear bubble & icon',
+    aiCardTitle: 'AI Response Glass Card',
+    aiCardSub: 'Wraps AI answers in a modern glassmorphism card for crystal clear readability on all wallpapers.',
+    aiCardToggle: 'Enable AI Glass Card',
+    aiCardOpacity: 'AI Card Darkness',
+    aiCardBlur: 'AI Card Blur',
     inputTitle: 'Chat Input Box',
     inputSub: 'Customize the composer frame without altering typing functionality.',
     stickerTitle: 'Decorative Stickers',
@@ -120,6 +131,7 @@ const I18N = {
     advTitle: 'Advanced & DOM Selector Picker',
     advSub: 'If an app update changes CSS classes, pick elements visually to bind styles cleanly.',
     pickBubble: '🎯 Pick Chat Bubble',
+    pickAiResponse: '🎯 Pick AI Response Area',
     pickInput: '🎯 Pick Input Box',
     pickSidebar: '🎯 Pick Sidebar',
     clearSelectors: 'Clear Custom Selectors',
@@ -288,6 +300,7 @@ export class SettingsPanel {
       atmosphereIntensity: cfg.atmosphereIntensity,
       bubbleId: cfg.bubbleId,
       bubbleMascotEnabled: Boolean(cfg.bubbleMascotEnabled),
+      aiCard: JSON.parse(JSON.stringify(cfg.aiCard || { enabled: true, opacity: 82, blur: 16 })),
       inputId: cfg.inputId,
       pet: JSON.parse(JSON.stringify(cfg.pet || { enabled: false, id: '' })),
       stickers: JSON.parse(JSON.stringify(cfg.stickers || { enabled: false, items: [] }))
@@ -439,7 +452,7 @@ export class SettingsPanel {
     overlay.querySelector('[data-modal-act="sync-current"]')?.addEventListener('click', (e) => {
       e.stopPropagation();
       const live = this.snapshotBundlePatch(this.getConfig());
-      syncedExtra = { accentColor: live.accentColor, atmosphereIntensity: live.atmosphereIntensity, bubbleMascotEnabled: live.bubbleMascotEnabled, stickers: live.stickers, pet: live.pet };
+      syncedExtra = { accentColor: live.accentColor, atmosphereIntensity: live.atmosphereIntensity, bubbleMascotEnabled: live.bubbleMascotEnabled, aiCard: live.aiCard, stickers: live.stickers, pet: live.pet };
       getField('wallpaperId').value = live.wallpaperId;
       getField('wallpaperFit').value = live.wallpaperFit;
       getField('atmosphereId').value = live.atmosphereId;
@@ -761,6 +774,40 @@ export class SettingsPanel {
         </div>
       </div>
 
+      <!-- AI Response Glass Card -->
+      <div class="agy-ct-section">
+        <div class="agy-ct-section-head" style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <h3>${escapeHtml(t.aiCardTitle)}</h3>
+            <p>${escapeHtml(t.aiCardSub)}</p>
+          </div>
+          <div>
+            <label class="agy-ct-switch">
+              <input type="checkbox" data-act="toggle-ai-card" ${(cfg.aiCard?.enabled ?? true) ? 'checked' : ''} />
+              <span>${escapeHtml(t.aiCardToggle)}</span>
+            </label>
+          </div>
+        </div>
+        ${
+          (cfg.aiCard?.enabled ?? true)
+            ? `
+          <div class="agy-ct-controls-box" style="margin-top:12px;">
+            <div class="agy-ct-slider-row">
+              <div class="agy-ct-slider-label"><strong>${escapeHtml(t.aiCardOpacity)}</strong></div>
+              <input type="range" class="agy-ct-range" min="30" max="98" value="${cfg.aiCard?.opacity ?? 82}" data-slider="aiCard.opacity" />
+              <span class="agy-ct-range-val" data-slider-val="aiCard.opacity">${cfg.aiCard?.opacity ?? 82}%</span>
+            </div>
+            <div class="agy-ct-slider-row">
+              <div class="agy-ct-slider-label"><strong>${escapeHtml(t.aiCardBlur)}</strong></div>
+              <input type="range" class="agy-ct-range" min="0" max="28" value="${cfg.aiCard?.blur ?? 16}" data-slider="aiCard.blur" />
+              <span class="agy-ct-range-val" data-slider-val="aiCard.blur">${cfg.aiCard?.blur ?? 16}px</span>
+            </div>
+          </div>
+        `
+            : ''
+        }
+      </div>
+
       <!-- Chat Input Box (Matches Image 1) -->
       <div class="agy-ct-section">
         <div class="agy-ct-section-head">
@@ -960,6 +1007,7 @@ export class SettingsPanel {
         </div>
         <div class="agy-ct-actions-row">
           <button type="button" class="agy-ct-btn" data-act="pick-dom" data-target="chatBubble" data-label="Bong bóng chat">${escapeHtml(t.pickBubble)}</button>
+          <button type="button" class="agy-ct-btn" data-act="pick-dom" data-target="aiResponse" data-label="Câu trả lời AI">${escapeHtml(t.pickAiResponse)}</button>
           <button type="button" class="agy-ct-btn" data-act="pick-dom" data-target="chatInput" data-label="Khung nhập chat">${escapeHtml(t.pickInput)}</button>
           <button type="button" class="agy-ct-btn" data-act="pick-dom" data-target="sidebar" data-label="Sidebar">${escapeHtml(t.pickSidebar)}</button>
           <button type="button" class="agy-ct-btn" data-act="clear-selectors">${escapeHtml(t.clearSelectors)}</button>
@@ -1192,6 +1240,7 @@ export class SettingsPanel {
             sidebar: '',
             mainCanvas: '',
             chatBubble: '',
+            aiResponse: '',
             chatInput: '',
             settingsNavList: '',
             settingsContent: ''
@@ -1247,6 +1296,9 @@ export class SettingsPanel {
         this.onPatch({ enabled: Boolean(el.checked) });
       } else if (act === 'toggle-bubble-mascot') {
         this.onPatch({ bubbleMascotEnabled: Boolean(el.checked) });
+      } else if (act === 'toggle-ai-card') {
+        const curAi = this.getConfig().aiCard || {};
+        this.onPatch({ aiCard: { ...curAi, enabled: Boolean(el.checked) } });
       } else if (act === 'toggle-stickers') {
         this.onPatch({ stickers: { enabled: Boolean(el.checked) } });
       } else if (act === 'toggle-pet') {
@@ -1271,12 +1323,15 @@ export class SettingsPanel {
         const num = Number(el.value);
         const labelEl = this.root.querySelector(`[data-slider-val="${key}"]`);
         if (labelEl) {
-          const unit = key === 'blur' || key === 'pet.size' ? 'px' : '%';
+          const unit = key === 'blur' || key === 'pet.size' || key === 'aiCard.blur' ? 'px' : '%';
           labelEl.textContent = `${num}${unit}`;
         }
         if (key.startsWith('pet.')) {
           const sub = key.split('.')[1];
           this.onLiveUpdate({ pet: { [sub]: num } });
+        } else if (key.startsWith('aiCard.')) {
+          const sub = key.split('.')[1];
+          this.onLiveUpdate({ aiCard: { [sub]: num } });
         } else {
           this.onLiveUpdate({ [key]: num });
         }

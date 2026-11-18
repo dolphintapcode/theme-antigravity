@@ -20,6 +20,11 @@ export const DEFAULT_CONFIG = {
   atmosphereIntensity: 65,
   bubbleId: 'loi-kiem',
   bubbleMascotEnabled: true,
+  aiCard: {
+    enabled: true,
+    opacity: 82,
+    blur: 16
+  },
   inputId: 'loi-anh-kim',
   pet: {
     enabled: true,
@@ -42,6 +47,7 @@ export const DEFAULT_CONFIG = {
     sidebar: '',
     mainCanvas: '',
     chatBubble: '',
+    aiResponse: '',
     chatInput: '',
     settingsNavList: '',
     settingsContent: ''
