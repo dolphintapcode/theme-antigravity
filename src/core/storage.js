@@ -12,6 +12,7 @@ export const DEFAULT_CONFIG = {
   lang: 'vi',
   wallpaperId: 'thunder-samurai',
   wallpaperFit: 'cover',
+  customWallpapers: [],
   dimming: 16,
   blur: 0,
   glassOpacity: 36,
@@ -152,6 +153,7 @@ export function syncConfigToHost(cfg) {
 export function resetConfig(current = null) {
   const fresh = deepClone(DEFAULT_CONFIG);
   if (current) {
+    fresh.customWallpapers = deepClone(current.customWallpapers || []);
     fresh.hiddenWallpapers = [...(current.hiddenWallpapers || [])];
     fresh.hiddenStickers = [...(current.hiddenStickers || [])];
     fresh.hiddenPets = [...(current.hiddenPets || [])];
@@ -246,24 +248,26 @@ export async function clearAllCustomMedia() {
 }
 
 export async function loadCustomMediaMap() {
-  const keys = ['wallpaper', 'pet', 'sticker'];
   const result = {};
   try {
     const db = await openMediaDb();
-    await Promise.all(
-      keys.map(
-        (key) =>
-          new Promise((resolve) => {
-            const tx = db.transaction(STORE_NAME, 'readonly');
-            const req = tx.objectStore(STORE_NAME).get(key);
-            req.onsuccess = () => {
-              if (req.result) result[key] = req.result;
-              resolve();
-            };
-            req.onerror = () => resolve();
-          })
-      )
-    );
+    await new Promise((resolve) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.openCursor();
+      req.onsuccess = (e) => {
+        const cursor = e.target.result;
+        if (cursor) {
+          if (typeof cursor.value === 'string' && cursor.value.startsWith('data:')) {
+            result[cursor.key] = cursor.value;
+          }
+          cursor.continue();
+        } else {
+          resolve();
+        }
+      };
+      req.onerror = () => resolve();
+    });
     db.close();
   } catch {
     // Ignore when IndexedDB unavailable
@@ -274,12 +278,18 @@ export async function loadCustomMediaMap() {
   if (boot) {
     const hasHostConfig = Boolean(boot.config && typeof boot.config === 'object');
     const bootMedia = boot.media && typeof boot.media === 'object' ? boot.media : {};
-    for (const key of keys) {
-      const fromDisk = typeof bootMedia[key] === 'string' ? bootMedia[key] : '';
-      if (fromDisk && (!result[key] || (hasHostConfig && result[key] !== fromDisk))) {
-        result[key] = fromDisk;
-        writeMediaToDb(key, fromDisk);
-      } else if (result[key] && !fromDisk) {
+
+    for (const [key, dataUrl] of Object.entries(bootMedia)) {
+      if (typeof dataUrl === 'string' && dataUrl.startsWith('data:')) {
+        if (!result[key] || (hasHostConfig && result[key] !== dataUrl)) {
+          result[key] = dataUrl;
+          writeMediaToDb(key, dataUrl);
+        }
+      }
+    }
+
+    for (const key of Object.keys(result)) {
+      if (!bootMedia[key]) {
         if (hasHostConfig) {
           // Host disk state is authoritative once initialized: purge stale deleted media from IndexedDB
           delete result[key];

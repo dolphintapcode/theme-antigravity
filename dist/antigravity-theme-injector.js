@@ -1319,7 +1319,8 @@ const WALLPAPERS = [
 function resolveWallpaperUrl(wallpaper, customUrlMap = {}) {
   if (!wallpaper) return '';
   if (wallpaper.id === 'none') return '';
-  if (wallpaper.id === 'custom') return customUrlMap.wallpaper || '';
+  if (wallpaper.id === 'custom') return customUrlMap.custom || customUrlMap.wallpaper || '';
+  if (customUrlMap[wallpaper.id]) return customUrlMap[wallpaper.id];
   if (wallpaper.embeddedDataUri) return wallpaper.embeddedDataUri;
   return wallpaper.previewPath || '';
 }
@@ -1927,6 +1928,7 @@ const DEFAULT_CONFIG = {
   lang: 'vi',
   wallpaperId: 'thunder-samurai',
   wallpaperFit: 'cover',
+  customWallpapers: [],
   dimming: 16,
   blur: 0,
   glassOpacity: 36,
@@ -2065,6 +2067,7 @@ function syncConfigToHost(cfg) {
 function resetConfig(current = null) {
   const fresh = deepClone(DEFAULT_CONFIG);
   if (current) {
+    fresh.customWallpapers = deepClone(current.customWallpapers || []);
     fresh.hiddenWallpapers = [...(current.hiddenWallpapers || [])];
     fresh.hiddenStickers = [...(current.hiddenStickers || [])];
     fresh.hiddenPets = [...(current.hiddenPets || [])];
@@ -2154,24 +2157,26 @@ async function clearAllCustomMedia() {
   }
 }
 async function loadCustomMediaMap() {
-  const keys = ['wallpaper', 'pet', 'sticker'];
   const result = {};
   try {
     const db = await openMediaDb();
-    await Promise.all(
-      keys.map(
-        (key) =>
-          new Promise((resolve) => {
-            const tx = db.transaction(STORE_NAME, 'readonly');
-            const req = tx.objectStore(STORE_NAME).get(key);
-            req.onsuccess = () => {
-              if (req.result) result[key] = req.result;
-              resolve();
-            };
-            req.onerror = () => resolve();
-          })
-      )
-    );
+    await new Promise((resolve) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.openCursor();
+      req.onsuccess = (e) => {
+        const cursor = e.target.result;
+        if (cursor) {
+          if (typeof cursor.value === 'string' && cursor.value.startsWith('data:')) {
+            result[cursor.key] = cursor.value;
+          }
+          cursor.continue();
+        } else {
+          resolve();
+        }
+      };
+      req.onerror = () => resolve();
+    });
     db.close();
   } catch {
     // Ignore when IndexedDB unavailable
@@ -2182,12 +2187,18 @@ async function loadCustomMediaMap() {
   if (boot) {
     const hasHostConfig = Boolean(boot.config && typeof boot.config === 'object');
     const bootMedia = boot.media && typeof boot.media === 'object' ? boot.media : {};
-    for (const key of keys) {
-      const fromDisk = typeof bootMedia[key] === 'string' ? bootMedia[key] : '';
-      if (fromDisk && (!result[key] || (hasHostConfig && result[key] !== fromDisk))) {
-        result[key] = fromDisk;
-        writeMediaToDb(key, fromDisk);
-      } else if (result[key] && !fromDisk) {
+
+    for (const [key, dataUrl] of Object.entries(bootMedia)) {
+      if (typeof dataUrl === 'string' && dataUrl.startsWith('data:')) {
+        if (!result[key] || (hasHostConfig && result[key] !== dataUrl)) {
+          result[key] = dataUrl;
+          writeMediaToDb(key, dataUrl);
+        }
+      }
+    }
+
+    for (const key of Object.keys(result)) {
+      if (!bootMedia[key]) {
         if (hasHostConfig) {
           // Host disk state is authoritative once initialized: purge stale deleted media from IndexedDB
           delete result[key];
@@ -2207,7 +2218,10 @@ const STYLE_ID = 'agy-ct-styles';
 function resolveActiveWallpaperUrl(config, customMedia = {}) {
   if (!config?.enabled) return '';
   if (config.wallpaperId === 'custom') {
-    return customMedia.wallpaper || '';
+    return customMedia.custom || customMedia.wallpaper || '';
+  }
+  if (config.wallpaperId && customMedia[config.wallpaperId]) {
+    return customMedia[config.wallpaperId];
   }
   const wp = WALLPAPERS.find((w) => w.id === config.wallpaperId);
   return resolveWallpaperUrl(wp, customMedia);
@@ -4688,122 +4702,182 @@ class DomAdapter {
 const PET_QUIPS = {
   'loi-kiem': {
     vi: [
-      'Lôi Chi Hô Hấp: Nhất Thiểm! ⚡',
-      'Mưa rơi nhưng kiếm vẫn sáng~ 🗡️',
-      'Tập trung viết code nào!',
-      'Đừng quên lưu file nhé ⚡'
+      'Lôi Chi Hô Hấp: Thức thứ 9 - Git Push Force lên Main! ⚡🔥',
+      'Chém bug như chém gió, đến lúc build thì toang hoác! 🗡️💀',
+      'Tốc độ gõ 150 WPM nhưng fix cái bug mất 3 ngày à bro? ⚡',
+      'Kiếm bén cỡ nào cũng không chém nổi quả bug thiếu dấu chấm phẩy đâu! 🗡️',
+      'Đang chém code hăng say thì sập server... rút kiếm chém sếp liền! ⚡',
+      'Dũng sĩ diệt bug hay dũng sĩ sinh ra bug thế? 🗡️👀',
+      'Test thẳng trên production đi, kiếm sĩ chân chính sợ gì ai! ⚡'
     ],
     en: [
-      'Thunder Breathing: First Form! ⚡',
-      'Rain falls, blade stays sharp~ 🗡️',
-      'Time to ship clean code!',
-      'Remember to save your work ⚡'
+      'Thunder Breathing: Ninth Form - Force Push to Main! ⚡🔥',
+      'Slashing bugs at 150 WPM... still broke the build though! 🗡️💀',
+      'Your blade is sharp, but your regex is cursed beyond repair. ⚡',
+      'No katana in the world can cut through a missing semicolon! 🗡️',
+      'Real warriors test directly in production! Slay or be slayed! ⚡',
+      'Are you fixing bugs or just spawning new ones with style? 🗡️👀',
+      'Server crashed! Keep calm and draw your sword against the PM! ⚡'
     ]
   },
   'rong-ngoc': {
     vi: [
-      'Rồng ngọc chúc bạn bug-free! 🐉',
-      'Năng lượng ngọc bích đang tràn đầy ✨',
-      'Hôm nay build gì tiếp nào?',
-      'Bay một vòng rồi làm tiếp nhé~'
+      'Rồng thần cũng xin quỳ trước quả logic siêu thực này của nhà ngươi! 🐉',
+      'Ước code không bug à? Rồng thần bảo: Ước cái gì thực tế hơn đi bạn ơi! ✨',
+      'Hào quang ngọc bích soi rọi đống tech debt từ 5 năm trước chưa dọn! 🐉',
+      'Deploy chiều thứ Sáu? Đến loài rồng bất tử còn không dám liều mạng thế! 🔥',
+      'Triệu hồi rồng ngọc ngàn năm chỉ để hỏi cách căn giữa một cái thẻ div? 🐉',
+      'Bảo trì hệ thống 5 phút thành 5 tiếng rồi đấy, thần long cũng cứu không nổi! 💀',
+      'Long vương phán: Bug này không phải lỗi, đây là một tính năng thần bí! ✨'
     ],
     en: [
-      'Jade Dragon blesses zero bugs! 🐉',
-      'Emerald mana fully charged ✨',
-      'What are we building today?',
-      'Take a quick stretch~'
+      'Even the Ancient Dragon cannot fathom this spaghetti logic! 🐉',
+      'You wish for zero bugs? Ask for something realistic like a pet unicorn! ✨',
+      'Behold! Emerald radiance illuminating 5 years of uncleaned tech debt! 🐉',
+      'Deploying on Friday afternoon? Even immortal dragons fear that curse! 🔥',
+      'You summoned the mythical dragon... just to ask how to center a div? 🐉',
+      'Estimated 5-minute maintenance turned into 5 hours of sheer panic! 💀',
+      'Dragon decree: This is not a bug, it is a sacred mystical feature! ✨'
     ]
   },
   'ho-ly-chibi': {
     vi: [
-      'Hồ ly tới cổ vũ bạn đây! 🦊',
-      'Nghỉ uống ngụm nước nha~ 🍵',
-      'Code mượt như đuôi hồ ly ✨',
-      'Kitsune luôn bên cạnh bạn!'
+      'Ủa ai viết đống code rác này vậy nè? Git blame thử đi rồi tự khóc! 🦊',
+      'Chọt chọt cái gì! Task Jira từ tuần trước đã tick Done chưa dọ? 🐾',
+      'Code chạy ngon trên máy em mà! Nhưng khách có mua máy em đâu? 🦊',
+      'Lại copy code AI về paste mà không thèm đọc đúng không, bắt quả tang nha! 🦊✨',
+      'Nghỉ tay uống miếng nước đi, ngồi cong lưng cột sống thành dấu chấm phẩy rồi kìa! 🍵',
+      'Bug khó quá thì tắt máy đi ngủ, mai tỉnh dậy bug vẫn còn đó chờ bạn mà~ 🦊💤',
+      'Lương nghìn đô mà cái bug 500 Internal Error tìm cả buổi không ra dọ? 🦊'
     ],
     en: [
-      'Chibi Fox cheering you on! 🦊',
-      'Hydration check~ 🍵',
-      'Smooth code, fluffy tails ✨',
-      'Kitsune magic activated!'
+      'Who wrote this monstrosity? Run git blame and prepare to cry! 🦊',
+      'Stop poking me! Did you close that Jira ticket from last sprint? 🐾',
+      'It works on my machine! Too bad we do not sell your laptop to clients! 🦊',
+      'Caught you copying AI code without even reading the comments! 🦊✨',
+      'Hydrate now! Your spine is currently shaped like a semicolon! 🍵',
+      'Stuck on a bug? Go to sleep, it will still be waiting tomorrow morning~ 🦊💤',
+      'Senior salary, yet puzzled by a simple 500 Internal Server Error? 🦊'
     ]
   },
   'meo-than': {
     vi: [
-      'Meow~ Nghỉ tay xoa đầu mèo đi 🐱',
-      'Grrr... phát hiện một bug nhỏ!',
-      'Mèo than đang canh màn hình cho bạn~',
-      'Ngủ trưa 5 phút không nè? 🐾'
+      'Meow~ Thay vì ngồi sửa bug vô vọng, hãy cung phụng pate cho mèo đi! 🐱',
+      'Sếp đang đi lướt phía sau kìa, bấm Alt + Tab lẹ không là toang! 🐾',
+      'Console.log("vào đây chưa ta") lần thứ 99 rồi đấy bro... 🐱',
+      'Deadline dí sát mông rồi mà vẫn ngồi đây gãi bụng mèo à? Dũng cảm đấy! 🐾',
+      'Mèo vừa giẫm lên bàn phím, trông code còn sạch hơn bạn tự viết đấy! 🐱',
+      'Tính năng này không có lỗi, đó là tính năng tạo bất ngờ cho tester! 🐾',
+      'Xóa node_modules đi cài lại xem? Không được thì đổ tại môi trường! 🐱✨'
     ],
     en: [
-      'Meow~ Pet the kitty for good luck 🐱',
-      'Purring at 60 FPS~',
-      'Guard cat on duty 🐾',
-      'Quick catnap break?'
+      'Meow~ Stop fixing bugs and feed your feline overlord already! 🐱',
+      'Boss detected approaching from behind! Alt + Tab IMMEDIATELY! 🐾',
+      'Console.log("here pls work") for the 99th time today... Found it yet? 🐱',
+      'Deadline is in 2 hours and you are petting a virtual cat? Pure courage. 🐾',
+      'I walked on your keyboard and accidentally improved your code quality. 🐱',
+      'It is not a bug, it is an element of surprise for QA testers! 🐾',
+      'Delete node_modules and npm install again? If it fails, blame the OS! 🐱✨'
     ]
   },
   'meo-huyen-thuat': {
     vi: [
-      'Phép thuật cổ ngữ đã sẵn sàng 🔮',
-      'Mọi lỗi compile sẽ tan biến~ ✨',
-      'Meow! Triệu hồi thuật toán tối ưu!',
-      'Ánh lửa huyền thuật đang soi sáng 🔥'
+      'Úm ba la xì bùa... Biến 1 warning vô hại thành 20 fatal errors! 🔮✨',
+      'Ma pháp tối thượng: rm -rf node_modules rồi ngồi tải lại cả thế giới! 🔥',
+      'Quy luật huyền bí: Bug chỉ xuất hiện khi bật màn hình share cho sếp xem! 🪄',
+      'Lỗi này không phải do code đâu, do phong thủy bàn làm việc khắc mệnh đấy! 🔮',
+      'Triệu hồi ma thuật phòng thủ: Đổ tại lỗi mạng và bên thứ ba sập! 🕯️',
+      'Cầu nguyện đi! Commit tiếp theo tỉ lệ cao là nát tan nát bét cả hệ thống! 🔥',
+      'Năng lượng vũ trụ mách bảo: Hôm nay không nên deploy cái gì hết! 🔮'
     ],
     en: [
-      'Arcane runes aligned 🔮',
-      'May all build errors vanish~ ✨',
-      'Summoning clean architecture!',
-      'Mystic aura active 🔥'
+      'Abra-ca-dabra! Turned 1 benign warning into 20 fatal build errors! 🔮✨',
+      'Forbidden dark spell: rm -rf node_modules and re-download the internet! 🔥',
+      'Mystic law: Bugs only manifest when screen-sharing with the client! 🪄',
+      'Not a syntax error. Clearly bad feng shui at your workstation. 🔮',
+      'Summon the ultimate defensive spell: Blame third-party API outages! 🕯️',
+      'Say your prayers! That upcoming commit has high destructive potential! 🔥',
+      'Cosmic omen: Today is definitively not a good day to deploy! 🔮'
     ]
   },
   'phu-thuy-anh-trang': {
     vi: [
-      'Ánh trăng soi đường cho dev đêm 🌙',
-      'Pha chế xong lọ mana code sạch ✨',
-      'Bay lên nào! 🧹',
-      'Đêm nay deploy suôn sẻ nha~'
+      'Lại thức đêm cày code à? Đếm xem đầu còn bao nhiêu cọng tóc nữa bạn ơi? 🌙🧹',
+      'Pha chế thần dược tăng ca: 10% cà phê, 90% nước mắt của lập trình viên! ✨',
+      'Trăng thanh gió mát, thời khắc hoàng đạo để merge conflict 300 files! 🌕',
+      'Deploy lúc 0h đêm: Cảm giác tim đập chân run hơn cả xem phim kinh dị! 🌙',
+      'Dev bảo tính năng này làm 2 tiếng là xong, và đó là chuyện của 2 tuần trước! 🧹',
+      'Ngủ đi bạn ơi, thức khuya code chỉ sinh thêm bug quái vật thôi! 🌙💤',
+      'Ước lượng thời gian chuẩn của dev: Lấy số ước tính nhân 3 rồi đổi sang đơn vị lớn hơn! ✨'
     ],
     en: [
-      'Moonlight guides midnight devs 🌙',
-      'Brewed a clean-code potion ✨',
-      'Up and away! 🧹',
-      'Smooth deploys tonight~'
+      'Midnight coding session? Count your remaining hair strands, darling! 🌙🧹',
+      'Brewing developer potion: 10% caffeine, 90% existential dread! ✨',
+      'Full moon tonight! Perfect mystical hour to resolve 300 merge conflicts! 🌕',
+      'Midnight prod deploy: Heart rate higher than any horror movie jump-scare! 🌙',
+      'You said this task takes 2 hours... that was two weeks ago! 🧹',
+      'Go to sleep! Coding while sleep-deprived only breeds monster bugs! 🌙💤',
+      'Developer estimation rule: Multiply by 3 and bump to the next time unit! ✨'
     ]
   },
   'hoa-anh-dao': {
     vi: [
-      'Gió xuân mang hoa anh đào tới 🌸',
-      'Bình tĩnh debug từng dòng nhé~',
-      'Thật nhẹ nhàng và tập trung ✨'
+      'Cánh hoa rơi nghiêng như cách server production sắp sập vậy~ 🌸',
+      'Bình tĩnh hít một hơi thật sâu... rồi gõ git reset --hard làm lại cuộc đời! ✨',
+      'Mọi thứ ở đây đều đẹp đẽ thơ mộng, trừ cái database schema của bạn ra! 🌸',
+      'Tâm bất biến giữa dòng đời vạn bug, kệ đời PM dí ta cứ thong dong~ 🍵',
+      '// TODO: Sẽ tối ưu lại chỗ này (lần sửa cuối: 3 năm trước) 🌸',
+      'Code viết như thơ, tiếc là thơ trừu tượng siêu thực không ai hiểu nổi! ✨',
+      'Bình tĩnh nhấp chén trà, đợi sếp chửi xong rồi ta fix tiếp~ 🌸'
     ],
     en: [
-      'Sakura breeze brings calm focus 🌸',
-      'One clean step at a time~',
-      'Peaceful coding vibes ✨'
+      'Cherry blossoms fall gracefully, just like your production servers~ 🌸',
+      'Take a deep breath of spring air... then git reset --hard your life choices! ✨',
+      'Everything here is poetic and beautiful, except your database schema! 🌸',
+      'Inner peace amidst a storm of exceptions... let the PM ping in vain~ 🍵',
+      '// TODO: will refactor this later (last committed: 3 years ago) 🌸',
+      'Your code is like abstract poetry: aesthetically pleasing, completely unreadable! ✨',
+      'Sip some green tea calmly while the CI/CD pipeline burns down in red~ 🌸'
     ]
   },
   'den-long': {
     vi: [
-      'Đèn lồng thắp sáng ý tưởng mới 🏮',
-      'Ấm áp giữa đêm mưa ✨',
-      'Tiếp tục hành trình nào!'
+      'Đèn soi sáng con đường cho bạn... đi thẳng vào ngõ cụt kiến trúc! 🏮',
+      'Thắp đèn lên xem ai vừa lén commit code thẳng vào branch master/main! 🏮👀',
+      'Dầu đèn thì có thể cạn, chứ deadline với bug thì thiên thu bất tận! ✨',
+      'Ánh đèn lung linh rạng ngời, sáng rực như màn hình xanh chết chóc (BSOD)! 💡',
+      'Soi đèn tìm bug cả ngày, hóa ra do gõ nhầm tên biến một chữ cái! 🏮💀',
+      'Đèn thắp giữa đêm khuya: Đài tưởng niệm sự hy sinh vì estimate ẩu! 🏮',
+      'Sáng rực rỡ như tương lai của bạn khi tính năng vừa release bị crash ngay lập tức! 🏮'
     ],
     en: [
-      'Lantern glowing with fresh ideas 🏮',
-      'Warm light in the dark night ✨',
-      'Keep building!'
+      'Guiding your path brightly... straight into architectural dead ends! 🏮',
+      'Holding up the lantern to reveal who pushed unreviewed code to main! 🏮👀',
+      'Oil in the lantern may run dry, but bugs and Jira tasks are eternal! ✨',
+      'Radiant and glowing, as majestic as a fresh Blue Screen of Death! 💡',
+      'Hunted for the bug for 6 hours... turned out to be a single typo! 🏮💀',
+      'Lantern burning past 2 AM: A monument to reckless time estimates! 🏮',
+      'Shining as brilliantly as your app crashing 5 seconds after release! 🏮'
     ]
   },
   'ca-koi': {
     vi: [
-      'Cá Koi mang may mắn tới nè 🐟',
-      'Bơi giữa dải ngân hà tinh tú ✨',
-      'Mọi thứ sẽ trôi chảy như nước~'
+      'Cá Koi vượt vũ môn hóa rồng, dev vượt qua deadline thì hóa rồ! 🐟✨',
+      'Bơi lội ngược dòng đời, lặn ngụp trong đống code thừa không ai dám xóa! 🌊',
+      'May mắn của cá thần cũng không gánh nổi quả query quét sạch bảng không có Index! 🐟',
+      'Nước biển mênh mông cũng không mặn bằng giọt nước mắt dev lúc rollback prod! 🌊',
+      'Cứ bơi thong thả quẫy đuôi đi, khách hàng mới log có 50 cái bug P1 thôi mà! 🐟',
+      'Chìm đắm trong vòng lặp vô tận (infinite loop), vĩnh viễn không có lối thoát! 🌊💀',
+      'Bơi theo dòng sự kiện: Server sập thì cứ bảo do cá mập cắn cáp quang nhé! 🐟'
     ],
     en: [
-      'Cosmic Koi brings good fortune 🐟',
-      'Swimming through starlight ✨',
-      'Flow like water~'
+      'Koi leaps over the gate to become a dragon; Dev survives deadline to become insane! 🐟✨',
+      'Swimming through an ocean of legacy code that nobody dares to touch! 🌊',
+      'All the luck in the cosmos cannot save a SELECT * query without an index! 🐟',
+      'The sea is deep, but not as deep as dev tears during a prod rollback! 🌊',
+      'Just keep swimming! QA only logged 50 critical P1 bugs this morning! 🐟',
+      'Trapped in an infinite while-loop, swimming forever without a break condition! 🌊💀',
+      'Whenever the server drops, just blame undersea sharks chewing fiber cables! 🐟'
     ]
   }
 };
@@ -4902,7 +4976,10 @@ class PetStage {
     if (!cfg.pet?.showSpeechOnClick) return;
     const petId = cfg.pet.id;
     const lang = cfg.lang === 'en' ? 'en' : 'vi';
-    const bank = PET_QUIPS[petId]?.[lang] || (lang === 'en' ? ['Hello! ✨', 'Happy coding!'] : ['Xin chào! ✨', 'Code vui nhé!']);
+    const fallbackBank = lang === 'en'
+      ? ['It works on my machine! 🤷', 'Keep calm and blame the cache! ⚡', 'Testing in prod? Brave soul! 💥', 'Coffee in, bugs out! ☕']
+      : ['Code chạy trên máy em bình thường mà! 🤷', 'Bình tĩnh đổ tại cache đi bạn ơi! ⚡', 'Đang test thẳng trên prod à? Dũng cảm đấy! 💥', 'Cà phê vào, bug tự khắc bay màu! ☕'];
+    const bank = PET_QUIPS[petId]?.[lang] || fallbackBank;
     const line = bank[Math.floor(Math.random() * bank.length)];
 
     if (this.speechEl) {
@@ -5507,6 +5584,21 @@ class SettingsPanel {
     });
   }
 
+  getCustomWallpapersList() {
+    const cfg = this.getConfig();
+    const customMedia = this.getCustomMedia();
+    const list = Array.isArray(cfg.customWallpapers) ? [...cfg.customWallpapers] : [];
+    if ((customMedia.wallpaper || customMedia.custom) && !list.some((w) => w.id === 'custom')) {
+      list.unshift({ id: 'custom', name: 'Custom Image' });
+    }
+    for (const key of Object.keys(customMedia)) {
+      if (key.startsWith('custom-wp-') && !list.some((w) => w.id === key)) {
+        list.push({ id: key, name: 'Custom Image' });
+      }
+    }
+    return list;
+  }
+
   snapshotBundlePatch(cfg) {
     return {
       wallpaperId: cfg.wallpaperId,
@@ -5530,18 +5622,23 @@ class SettingsPanel {
     const p = bundle?.patch || {};
     const customMedia = this.getCustomMedia();
     const wpObj = WALLPAPERS.find((w) => w.id === p.wallpaperId);
-    const wpName =
-      p.wallpaperId === 'custom'
-        ? customMedia.wallpaper
-          ? 'Custom Image'
-          : lang === 'en'
-          ? 'No Wallpaper'
-          : 'Không nền'
-        : wpObj
-        ? lang === 'en'
-          ? wpObj.nameEn
-          : wpObj.name
-        : p.wallpaperId || 'none';
+    const customWp = this.getCustomWallpapersList().find((w) => w.id === p.wallpaperId);
+    const isCustom = p.wallpaperId === 'custom' || p.wallpaperId?.startsWith('custom-');
+    const hasCustom =
+      isCustom &&
+      Boolean(
+        customMedia[p.wallpaperId] ||
+          (p.wallpaperId === 'custom' && (customMedia.custom || customMedia.wallpaper))
+      );
+    const wpName = isCustom
+      ? hasCustom
+        ? (customWp?.name || 'Custom Image')
+        : (lang === 'en' ? 'No Wallpaper' : 'Không nền')
+      : wpObj
+      ? lang === 'en'
+        ? wpObj.nameEn
+        : wpObj.name
+      : p.wallpaperId || 'none';
     const atmoObj = ATMOSPHERE_PRESETS.find((a) => a.id === p.atmosphereId);
     const atmoName = atmoObj ? (lang === 'en' ? atmoObj.nameEn : atmoObj.name) : '';
     const petName =
@@ -5575,9 +5672,10 @@ class SettingsPanel {
     const visiblePets = Object.entries(MASCOT_TEMPLATES).filter(([id, m]) => m.role.includes('pet') && !hiddenPets.has(id));
     const p = draft.patch || this.snapshotBundlePatch(cfg);
 
+    const customWallpapers = this.getCustomWallpapersList();
     const wpOptions = [
       ...visibleWps.map((w) => [w.id, lang === 'en' ? w.nameEn : w.name]),
-      ...(customMedia.wallpaper ? [['custom', 'Custom Image']] : [])
+      ...customWallpapers.map((w) => [w.id, w.name || 'Custom Image'])
     ];
     const petOptions = [
       ['', lang === 'en' ? 'Disabled (No Pet)' : 'Tắt Pet'],
@@ -5849,23 +5947,28 @@ class SettingsPanel {
               </div>
             `;
           }).join('')}
-          ${
-            customMedia.wallpaper
-              ? (() => {
-                  const customThumb = this.resolveThumb('wp:custom', customMedia.wallpaper);
-                  return `
-              <div role="button" tabindex="0" class="agy-ct-wp-card ${cfg.wallpaperId === 'custom' ? 'is-selected' : ''}" data-act="select-wp" data-id="custom">
-                <button type="button" class="agy-ct-card-del" data-act="delete-wp" data-id="custom" title="Xoá ảnh tải lên khỏi bộ nhớ">✕</button>
-                <div class="agy-ct-wp-thumb" data-thumb-key="wp:custom" style="${customThumb ? `background-image:url('${escapeHtml(customThumb)}')` : ''}"></div>
+          ${(() => {
+            const customWallpapers = this.getCustomWallpapersList();
+            return customWallpapers
+              .map((cWp) => {
+                const cDataUrl = customMedia[cWp.id] || (cWp.id === 'custom' ? customMedia.wallpaper : '');
+                if (!cDataUrl) return '';
+                const customThumb = this.resolveThumb(`wp:${cWp.id}`, cDataUrl);
+                const isSelected = cfg.wallpaperId === cWp.id || (cWp.id === 'custom' && cfg.wallpaperId === 'custom');
+                const displayName = cWp.name || (lang === 'en' ? 'Custom Image' : 'Ảnh tải lên');
+                return `
+              <div role="button" tabindex="0" class="agy-ct-wp-card ${isSelected ? 'is-selected' : ''}" data-act="select-wp" data-id="${escapeHtml(cWp.id)}">
+                <button type="button" class="agy-ct-card-del" data-act="delete-wp" data-id="${escapeHtml(cWp.id)}" title="${lang === 'en' ? 'Delete custom wallpaper' : 'Xoá ảnh tải lên khỏi bộ nhớ'}">✕</button>
+                <div class="agy-ct-wp-thumb" data-thumb-key="wp:${escapeHtml(cWp.id)}" style="${customThumb ? `background-image:url('${escapeHtml(customThumb)}')` : ''}"></div>
                 <div class="agy-ct-wp-meta">
-                  <span>Custom Image</span>
-                  ${cfg.wallpaperId === 'custom' ? '<span class="agy-ct-check">✓</span>' : ''}
+                  <span title="${escapeHtml(displayName)}">${escapeHtml(displayName)}</span>
+                  ${isSelected ? '<span class="agy-ct-check">✓</span>' : ''}
                 </div>
               </div>
             `;
-                })()
-              : ''
-          }
+              })
+              .join('');
+          })()}
           <button type="button" class="agy-ct-wp-card" data-act="upload-wp">
             <div class="agy-ct-wp-thumb"><span>📁 +</span></div>
             <div class="agy-ct-wp-meta"><span>${escapeHtml(t.uploadWp)}</span></div>
@@ -6291,8 +6394,10 @@ class SettingsPanel {
         e.stopPropagation();
         const id = target.dataset.id;
         const lang = cfg.lang === 'en' ? 'en' : 'vi';
+        const isCustom = id === 'custom' || id.startsWith('custom-');
+        const customWp = isCustom ? this.getCustomWallpapersList().find((w) => w.id === id) : null;
         const wpObj = WALLPAPERS.find((w) => w.id === id);
-        const wpName = id === 'custom' ? 'Custom Image' : (lang === 'en' ? wpObj?.nameEn : wpObj?.name) || id;
+        const wpName = isCustom ? (customWp?.name || 'Custom Image') : (lang === 'en' ? wpObj?.nameEn : wpObj?.name) || id;
         this.requestConfirm({
           title: lang === 'en' ? 'Confirm Delete Wallpaper' : 'Phê duyệt xoá ảnh nền',
           message:
@@ -6302,10 +6407,20 @@ class SettingsPanel {
           note: I18N[lang].confirmPermanentNote,
           onConfirm: () => {
             const freshCfg = this.getConfig();
-            if (id === 'custom') {
-              this.thumbCache.delete('wp:custom');
-              this.onDeleteMedia?.('wallpaper');
-              if (freshCfg.wallpaperId === 'custom') this.onPatch({ wallpaperId: 'none' });
+            if (isCustom) {
+              this.thumbCache.delete(`wp:${id}`);
+              if (id === 'custom') {
+                this.thumbCache.delete('wp:custom');
+                this.onDeleteMedia?.('wallpaper');
+              }
+              this.onDeleteMedia?.(id);
+
+              const nextCustomWps = (freshCfg.customWallpapers || []).filter((w) => w.id !== id);
+              const patch = { customWallpapers: nextCustomWps };
+              if (freshCfg.wallpaperId === id || (id === 'custom' && freshCfg.wallpaperId === 'custom')) {
+                patch.wallpaperId = nextCustomWps.length > 0 ? nextCustomWps[nextCustomWps.length - 1].id : 'none';
+              }
+              this.onPatch(patch);
             } else {
               this.thumbCache.delete(`wp:${id}`);
               const hidden = Array.from(new Set([...(freshCfg.hiddenWallpapers || []), id]));
@@ -6395,9 +6510,28 @@ class SettingsPanel {
           }
         });
       } else if (act === 'upload-wp') {
-        this.promptFileUpload('wallpaper', (dataUrl) => {
-          this.onUploadMedia('wallpaper', dataUrl);
-          this.onPatch({ wallpaperId: 'custom' });
+        this.promptFileUpload('wallpaper', (dataUrl, fileName) => {
+          const freshCfg = this.getConfig();
+          const customMedia = this.getCustomMedia();
+          const wpId = `custom-wp-${Date.now()}`;
+          const cleanName = fileName ? fileName.replace(/\.[^/.]+$/, '').trim().slice(0, 36) : '';
+          const lang = freshCfg.lang === 'en' ? 'en' : 'vi';
+          const defaultName = lang === 'en' ? 'Custom Image' : 'Ảnh tải lên';
+          const finalName = cleanName || defaultName;
+
+          this.onUploadMedia(wpId, dataUrl);
+
+          const customWallpapers = Array.isArray(freshCfg.customWallpapers) ? [...freshCfg.customWallpapers] : [];
+          // Preserve existing legacy 'custom' if present
+          if ((customMedia.wallpaper || customMedia.custom) && !customWallpapers.some((w) => w.id === 'custom')) {
+            customWallpapers.unshift({ id: 'custom', name: 'Custom Image' });
+          }
+          customWallpapers.push({ id: wpId, name: finalName, createdAt: Date.now() });
+
+          this.onPatch({
+            customWallpapers,
+            wallpaperId: wpId
+          });
         });
       } else if (act === 'upload-sticker') {
         this.promptFileUpload('sticker', (dataUrl) => {
@@ -6576,7 +6710,7 @@ class SettingsPanel {
       const file = input.files?.[0];
       if (!file) return;
       const dataUrl = await readFileAsDataUrl(file);
-      if (dataUrl) onDone(dataUrl);
+      if (dataUrl) onDone(dataUrl, file.name);
     };
     input.click();
   }
@@ -6641,25 +6775,37 @@ class CustomThemeInjector {
           this.refreshAll(true);
         },
         onClearRam: () => {
-          const keepWp = this.config.wallpaperId === 'custom';
+          const activeWpId = this.config.wallpaperId;
+          const customWpIds = new Set((this.config.customWallpapers || []).map((w) => w.id));
+          if (activeWpId) customWpIds.add(activeWpId);
+
           const keepPet = this.config.pet?.enabled && this.config.pet?.id === 'custom';
           const keepSticker =
             this.config.stickers?.enabled &&
             (this.config.stickers?.items || []).some((it) => it.id === 'custom');
-          if (!keepWp && this.customMedia.wallpaper) {
-            delete this.customMedia.wallpaper;
-            deleteCustomMedia('wallpaper');
-          }
-          if (!keepPet && this.customMedia.pet) {
-            delete this.customMedia.pet;
-            deleteCustomMedia('pet');
-          }
-          if (!keepSticker && this.customMedia.sticker) {
-            delete this.customMedia.sticker;
-            deleteCustomMedia('sticker');
-          }
-          if (!keepWp && !keepPet && !keepSticker) {
-            clearAllCustomMedia();
+
+          for (const key of Object.keys(this.customMedia)) {
+            if (key === 'pet') {
+              if (!keepPet) {
+                delete this.customMedia.pet;
+                deleteCustomMedia('pet');
+              }
+            } else if (key === 'sticker') {
+              if (!keepSticker) {
+                delete this.customMedia.sticker;
+                deleteCustomMedia('sticker');
+              }
+            } else if (key === 'wallpaper') {
+              if (!customWpIds.has('custom') && activeWpId !== 'custom') {
+                delete this.customMedia.wallpaper;
+                deleteCustomMedia('wallpaper');
+              }
+            } else if (key.startsWith('custom-wp-') || key.startsWith('custom-')) {
+              if (!customWpIds.has(key)) {
+                delete this.customMedia[key];
+                deleteCustomMedia(key);
+              }
+            }
           }
           this.refreshAll(true);
         },
@@ -6766,7 +6912,14 @@ class CustomThemeInjector {
     const hiddenWps = new Set(this.config.hiddenWallpapers || []);
     const hiddenStickers = new Set(this.config.hiddenStickers || []);
     const hiddenPets = new Set(this.config.hiddenPets || []);
-    if (patch.wallpaperId && (hiddenWps.has(patch.wallpaperId) || (patch.wallpaperId === 'custom' && !this.customMedia.wallpaper))) {
+    const isCustomWp = patch.wallpaperId === 'custom' || patch.wallpaperId?.startsWith('custom-');
+    const hasCustomWp =
+      isCustomWp &&
+      Boolean(
+        this.customMedia[patch.wallpaperId] ||
+          (patch.wallpaperId === 'custom' && (this.customMedia.custom || this.customMedia.wallpaper))
+      );
+    if (patch.wallpaperId && (hiddenWps.has(patch.wallpaperId) || (isCustomWp && !hasCustomWp))) {
       patch.wallpaperId = 'none';
     }
     if (patch.stickers?.items) {

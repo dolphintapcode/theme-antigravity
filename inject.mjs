@@ -34,6 +34,10 @@ const DAEMON_LOG_PATH = path.join(USER_DATA_DIR, 'sync-daemon.log');
 const OPEN_SETTINGS_FLAG_PATH = path.join(USER_DATA_DIR, 'open-settings.flag');
 
 const MEDIA_KEYS = ['wallpaper', 'pet', 'sticker'];
+
+function isValidMediaKey(key) {
+  return typeof key === 'string' && /^[a-z0-9_-]{1,80}$/i.test(key);
+}
 const BINDING_NAME = '__agyCtPersist';
 const POLL_INTERVAL_MS = 2500;
 const EXIT_AFTER_FAILED_POLLS = 4;
@@ -175,13 +179,21 @@ function mediaFilePath(key) {
 
 function readUserMedia() {
   const media = {};
-  for (const key of MEDIA_KEYS) {
-    try {
-      const value = fs.readFileSync(mediaFilePath(key), 'utf8');
-      if (value.startsWith('data:')) media[key] = value;
-    } catch {
-      // Not saved
+  ensureUserDataDirs();
+  try {
+    const entries = fs.readdirSync(USER_MEDIA_DIR);
+    for (const entry of entries) {
+      if (!entry.endsWith('.txt')) continue;
+      const key = path.basename(entry, '.txt');
+      try {
+        const value = fs.readFileSync(path.join(USER_MEDIA_DIR, entry), 'utf8');
+        if (value.startsWith('data:')) media[key] = value;
+      } catch {
+        // Not saved or unreadable
+      }
     }
+  } catch {
+    // Media directory not yet created or unreadable
   }
   return media;
 }
@@ -229,7 +241,7 @@ function persistFromPage(rawPayload) {
     writeFileAtomic(USER_CONFIG_PATH, JSON.stringify(msg.data, null, 2));
     return 'config';
   }
-  if (msg.type === 'media' && MEDIA_KEYS.includes(msg.key)) {
+  if (msg.type === 'media' && isValidMediaKey(msg.key)) {
     if (typeof msg.dataUrl === 'string' && msg.dataUrl.startsWith('data:')) {
       writeFileAtomic(mediaFilePath(msg.key), msg.dataUrl);
     } else {
@@ -238,7 +250,16 @@ function persistFromPage(rawPayload) {
     return 'media';
   }
   if (msg.type === 'media-clear') {
-    for (const key of MEDIA_KEYS) fs.rmSync(mediaFilePath(key), { force: true });
+    try {
+      const entries = fs.readdirSync(USER_MEDIA_DIR);
+      for (const entry of entries) {
+        if (entry.endsWith('.txt')) {
+          fs.rmSync(path.join(USER_MEDIA_DIR, entry), { force: true });
+        }
+      }
+    } catch {
+      // ignore
+    }
     return 'media';
   }
   return null;

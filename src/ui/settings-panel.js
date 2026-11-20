@@ -288,6 +288,21 @@ export class SettingsPanel {
     });
   }
 
+  getCustomWallpapersList() {
+    const cfg = this.getConfig();
+    const customMedia = this.getCustomMedia();
+    const list = Array.isArray(cfg.customWallpapers) ? [...cfg.customWallpapers] : [];
+    if ((customMedia.wallpaper || customMedia.custom) && !list.some((w) => w.id === 'custom')) {
+      list.unshift({ id: 'custom', name: 'Custom Image' });
+    }
+    for (const key of Object.keys(customMedia)) {
+      if (key.startsWith('custom-wp-') && !list.some((w) => w.id === key)) {
+        list.push({ id: key, name: 'Custom Image' });
+      }
+    }
+    return list;
+  }
+
   snapshotBundlePatch(cfg) {
     return {
       wallpaperId: cfg.wallpaperId,
@@ -311,18 +326,23 @@ export class SettingsPanel {
     const p = bundle?.patch || {};
     const customMedia = this.getCustomMedia();
     const wpObj = WALLPAPERS.find((w) => w.id === p.wallpaperId);
-    const wpName =
-      p.wallpaperId === 'custom'
-        ? customMedia.wallpaper
-          ? 'Custom Image'
-          : lang === 'en'
-          ? 'No Wallpaper'
-          : 'Không nền'
-        : wpObj
-        ? lang === 'en'
-          ? wpObj.nameEn
-          : wpObj.name
-        : p.wallpaperId || 'none';
+    const customWp = this.getCustomWallpapersList().find((w) => w.id === p.wallpaperId);
+    const isCustom = p.wallpaperId === 'custom' || p.wallpaperId?.startsWith('custom-');
+    const hasCustom =
+      isCustom &&
+      Boolean(
+        customMedia[p.wallpaperId] ||
+          (p.wallpaperId === 'custom' && (customMedia.custom || customMedia.wallpaper))
+      );
+    const wpName = isCustom
+      ? hasCustom
+        ? (customWp?.name || 'Custom Image')
+        : (lang === 'en' ? 'No Wallpaper' : 'Không nền')
+      : wpObj
+      ? lang === 'en'
+        ? wpObj.nameEn
+        : wpObj.name
+      : p.wallpaperId || 'none';
     const atmoObj = ATMOSPHERE_PRESETS.find((a) => a.id === p.atmosphereId);
     const atmoName = atmoObj ? (lang === 'en' ? atmoObj.nameEn : atmoObj.name) : '';
     const petName =
@@ -356,9 +376,10 @@ export class SettingsPanel {
     const visiblePets = Object.entries(MASCOT_TEMPLATES).filter(([id, m]) => m.role.includes('pet') && !hiddenPets.has(id));
     const p = draft.patch || this.snapshotBundlePatch(cfg);
 
+    const customWallpapers = this.getCustomWallpapersList();
     const wpOptions = [
       ...visibleWps.map((w) => [w.id, lang === 'en' ? w.nameEn : w.name]),
-      ...(customMedia.wallpaper ? [['custom', 'Custom Image']] : [])
+      ...customWallpapers.map((w) => [w.id, w.name || 'Custom Image'])
     ];
     const petOptions = [
       ['', lang === 'en' ? 'Disabled (No Pet)' : 'Tắt Pet'],
@@ -630,23 +651,28 @@ export class SettingsPanel {
               </div>
             `;
           }).join('')}
-          ${
-            customMedia.wallpaper
-              ? (() => {
-                  const customThumb = this.resolveThumb('wp:custom', customMedia.wallpaper);
-                  return `
-              <div role="button" tabindex="0" class="agy-ct-wp-card ${cfg.wallpaperId === 'custom' ? 'is-selected' : ''}" data-act="select-wp" data-id="custom">
-                <button type="button" class="agy-ct-card-del" data-act="delete-wp" data-id="custom" title="Xoá ảnh tải lên khỏi bộ nhớ">✕</button>
-                <div class="agy-ct-wp-thumb" data-thumb-key="wp:custom" style="${customThumb ? `background-image:url('${escapeHtml(customThumb)}')` : ''}"></div>
+          ${(() => {
+            const customWallpapers = this.getCustomWallpapersList();
+            return customWallpapers
+              .map((cWp) => {
+                const cDataUrl = customMedia[cWp.id] || (cWp.id === 'custom' ? customMedia.wallpaper : '');
+                if (!cDataUrl) return '';
+                const customThumb = this.resolveThumb(`wp:${cWp.id}`, cDataUrl);
+                const isSelected = cfg.wallpaperId === cWp.id || (cWp.id === 'custom' && cfg.wallpaperId === 'custom');
+                const displayName = cWp.name || (lang === 'en' ? 'Custom Image' : 'Ảnh tải lên');
+                return `
+              <div role="button" tabindex="0" class="agy-ct-wp-card ${isSelected ? 'is-selected' : ''}" data-act="select-wp" data-id="${escapeHtml(cWp.id)}">
+                <button type="button" class="agy-ct-card-del" data-act="delete-wp" data-id="${escapeHtml(cWp.id)}" title="${lang === 'en' ? 'Delete custom wallpaper' : 'Xoá ảnh tải lên khỏi bộ nhớ'}">✕</button>
+                <div class="agy-ct-wp-thumb" data-thumb-key="wp:${escapeHtml(cWp.id)}" style="${customThumb ? `background-image:url('${escapeHtml(customThumb)}')` : ''}"></div>
                 <div class="agy-ct-wp-meta">
-                  <span>Custom Image</span>
-                  ${cfg.wallpaperId === 'custom' ? '<span class="agy-ct-check">✓</span>' : ''}
+                  <span title="${escapeHtml(displayName)}">${escapeHtml(displayName)}</span>
+                  ${isSelected ? '<span class="agy-ct-check">✓</span>' : ''}
                 </div>
               </div>
             `;
-                })()
-              : ''
-          }
+              })
+              .join('');
+          })()}
           <button type="button" class="agy-ct-wp-card" data-act="upload-wp">
             <div class="agy-ct-wp-thumb"><span>📁 +</span></div>
             <div class="agy-ct-wp-meta"><span>${escapeHtml(t.uploadWp)}</span></div>
@@ -1072,8 +1098,10 @@ export class SettingsPanel {
         e.stopPropagation();
         const id = target.dataset.id;
         const lang = cfg.lang === 'en' ? 'en' : 'vi';
+        const isCustom = id === 'custom' || id.startsWith('custom-');
+        const customWp = isCustom ? this.getCustomWallpapersList().find((w) => w.id === id) : null;
         const wpObj = WALLPAPERS.find((w) => w.id === id);
-        const wpName = id === 'custom' ? 'Custom Image' : (lang === 'en' ? wpObj?.nameEn : wpObj?.name) || id;
+        const wpName = isCustom ? (customWp?.name || 'Custom Image') : (lang === 'en' ? wpObj?.nameEn : wpObj?.name) || id;
         this.requestConfirm({
           title: lang === 'en' ? 'Confirm Delete Wallpaper' : 'Phê duyệt xoá ảnh nền',
           message:
@@ -1083,10 +1111,20 @@ export class SettingsPanel {
           note: I18N[lang].confirmPermanentNote,
           onConfirm: () => {
             const freshCfg = this.getConfig();
-            if (id === 'custom') {
-              this.thumbCache.delete('wp:custom');
-              this.onDeleteMedia?.('wallpaper');
-              if (freshCfg.wallpaperId === 'custom') this.onPatch({ wallpaperId: 'none' });
+            if (isCustom) {
+              this.thumbCache.delete(`wp:${id}`);
+              if (id === 'custom') {
+                this.thumbCache.delete('wp:custom');
+                this.onDeleteMedia?.('wallpaper');
+              }
+              this.onDeleteMedia?.(id);
+
+              const nextCustomWps = (freshCfg.customWallpapers || []).filter((w) => w.id !== id);
+              const patch = { customWallpapers: nextCustomWps };
+              if (freshCfg.wallpaperId === id || (id === 'custom' && freshCfg.wallpaperId === 'custom')) {
+                patch.wallpaperId = nextCustomWps.length > 0 ? nextCustomWps[nextCustomWps.length - 1].id : 'none';
+              }
+              this.onPatch(patch);
             } else {
               this.thumbCache.delete(`wp:${id}`);
               const hidden = Array.from(new Set([...(freshCfg.hiddenWallpapers || []), id]));
@@ -1176,9 +1214,28 @@ export class SettingsPanel {
           }
         });
       } else if (act === 'upload-wp') {
-        this.promptFileUpload('wallpaper', (dataUrl) => {
-          this.onUploadMedia('wallpaper', dataUrl);
-          this.onPatch({ wallpaperId: 'custom' });
+        this.promptFileUpload('wallpaper', (dataUrl, fileName) => {
+          const freshCfg = this.getConfig();
+          const customMedia = this.getCustomMedia();
+          const wpId = `custom-wp-${Date.now()}`;
+          const cleanName = fileName ? fileName.replace(/\.[^/.]+$/, '').trim().slice(0, 36) : '';
+          const lang = freshCfg.lang === 'en' ? 'en' : 'vi';
+          const defaultName = lang === 'en' ? 'Custom Image' : 'Ảnh tải lên';
+          const finalName = cleanName || defaultName;
+
+          this.onUploadMedia(wpId, dataUrl);
+
+          const customWallpapers = Array.isArray(freshCfg.customWallpapers) ? [...freshCfg.customWallpapers] : [];
+          // Preserve existing legacy 'custom' if present
+          if ((customMedia.wallpaper || customMedia.custom) && !customWallpapers.some((w) => w.id === 'custom')) {
+            customWallpapers.unshift({ id: 'custom', name: 'Custom Image' });
+          }
+          customWallpapers.push({ id: wpId, name: finalName, createdAt: Date.now() });
+
+          this.onPatch({
+            customWallpapers,
+            wallpaperId: wpId
+          });
         });
       } else if (act === 'upload-sticker') {
         this.promptFileUpload('sticker', (dataUrl) => {
@@ -1357,7 +1414,7 @@ export class SettingsPanel {
       const file = input.files?.[0];
       if (!file) return;
       const dataUrl = await readFileAsDataUrl(file);
-      if (dataUrl) onDone(dataUrl);
+      if (dataUrl) onDone(dataUrl, file.name);
     };
     input.click();
   }

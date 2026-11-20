@@ -75,25 +75,37 @@ class CustomThemeInjector {
           this.refreshAll(true);
         },
         onClearRam: () => {
-          const keepWp = this.config.wallpaperId === 'custom';
+          const activeWpId = this.config.wallpaperId;
+          const customWpIds = new Set((this.config.customWallpapers || []).map((w) => w.id));
+          if (activeWpId) customWpIds.add(activeWpId);
+
           const keepPet = this.config.pet?.enabled && this.config.pet?.id === 'custom';
           const keepSticker =
             this.config.stickers?.enabled &&
             (this.config.stickers?.items || []).some((it) => it.id === 'custom');
-          if (!keepWp && this.customMedia.wallpaper) {
-            delete this.customMedia.wallpaper;
-            deleteCustomMedia('wallpaper');
-          }
-          if (!keepPet && this.customMedia.pet) {
-            delete this.customMedia.pet;
-            deleteCustomMedia('pet');
-          }
-          if (!keepSticker && this.customMedia.sticker) {
-            delete this.customMedia.sticker;
-            deleteCustomMedia('sticker');
-          }
-          if (!keepWp && !keepPet && !keepSticker) {
-            clearAllCustomMedia();
+
+          for (const key of Object.keys(this.customMedia)) {
+            if (key === 'pet') {
+              if (!keepPet) {
+                delete this.customMedia.pet;
+                deleteCustomMedia('pet');
+              }
+            } else if (key === 'sticker') {
+              if (!keepSticker) {
+                delete this.customMedia.sticker;
+                deleteCustomMedia('sticker');
+              }
+            } else if (key === 'wallpaper') {
+              if (!customWpIds.has('custom') && activeWpId !== 'custom') {
+                delete this.customMedia.wallpaper;
+                deleteCustomMedia('wallpaper');
+              }
+            } else if (key.startsWith('custom-wp-') || key.startsWith('custom-')) {
+              if (!customWpIds.has(key)) {
+                delete this.customMedia[key];
+                deleteCustomMedia(key);
+              }
+            }
           }
           this.refreshAll(true);
         },
@@ -200,7 +212,14 @@ class CustomThemeInjector {
     const hiddenWps = new Set(this.config.hiddenWallpapers || []);
     const hiddenStickers = new Set(this.config.hiddenStickers || []);
     const hiddenPets = new Set(this.config.hiddenPets || []);
-    if (patch.wallpaperId && (hiddenWps.has(patch.wallpaperId) || (patch.wallpaperId === 'custom' && !this.customMedia.wallpaper))) {
+    const isCustomWp = patch.wallpaperId === 'custom' || patch.wallpaperId?.startsWith('custom-');
+    const hasCustomWp =
+      isCustomWp &&
+      Boolean(
+        this.customMedia[patch.wallpaperId] ||
+          (patch.wallpaperId === 'custom' && (this.customMedia.custom || this.customMedia.wallpaper))
+      );
+    if (patch.wallpaperId && (hiddenWps.has(patch.wallpaperId) || (isCustomWp && !hasCustomWp))) {
       patch.wallpaperId = 'none';
     }
     if (patch.stickers?.items) {

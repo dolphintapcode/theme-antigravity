@@ -7,7 +7,10 @@ const STYLE_ID = 'agy-ct-styles';
 function resolveActiveWallpaperUrl(config, customMedia = {}) {
   if (!config?.enabled) return '';
   if (config.wallpaperId === 'custom') {
-    return customMedia.wallpaper || '';
+    return customMedia.custom || customMedia.wallpaper || '';
+  }
+  if (config.wallpaperId && customMedia[config.wallpaperId]) {
+    return customMedia[config.wallpaperId];
   }
   const wp = WALLPAPERS.find((w) => w.id === config.wallpaperId);
   return resolveWallpaperUrl(wp, customMedia);

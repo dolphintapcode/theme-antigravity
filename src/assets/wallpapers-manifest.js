@@ -106,7 +106,8 @@ export const WALLPAPERS = [
 export function resolveWallpaperUrl(wallpaper, customUrlMap = {}) {
   if (!wallpaper) return '';
   if (wallpaper.id === 'none') return '';
-  if (wallpaper.id === 'custom') return customUrlMap.wallpaper || '';
+  if (wallpaper.id === 'custom') return customUrlMap.custom || customUrlMap.wallpaper || '';
+  if (customUrlMap[wallpaper.id]) return customUrlMap[wallpaper.id];
   if (wallpaper.embeddedDataUri) return wallpaper.embeddedDataUri;
   return wallpaper.previewPath || '';
 }
